@@ -66,6 +66,9 @@ audition:start(AppWatcher)
 local iawriter = require('./IaWriter'):new()
 iawriter:start(AppWatcher)
 
+local dynalist = require('./Dynalist'):new()
+dynalist:start(AppWatcher)
+
 -- Moving Windows Around on Screen, onto other Screens, and to Spaces (left/right)
 local moveWindow = require("./moveWindow")
 
