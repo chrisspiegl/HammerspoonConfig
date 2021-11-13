@@ -2,10 +2,16 @@
 -- Hammerspoon Configuration and Precheck
 
 hs.logger.defaultLogLevel="info"
+print("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n")
 print("Is Hammerspoon in the Accessibility Privacy settings activated?")
-print(hs.accessibilityState() and "Yes, all good." or "No, you have to add Hammerspoon there!")
+print(hs.accessibilityState() and "\tYes, all good." or "\tNo, you have to add Hammerspoon there!")
 local reload_watcher = hs.pathwatcher.new(hs.configdir, hs.reload):start()
 
+if hs.keycodes.setLayout('U.S.') then
+  print("Successfully set Layout to U.S.")
+else
+  print("You have to set the layout to U.S. yourself!")
+end
 if hs.keycodes.currentLayout() == 'U.S.' then
   hs.alert('U.S. Keyboard Layout Selected')
 else
@@ -40,16 +46,16 @@ option = {"option"}
 control = {"control"}
 
 local applicationHotkeys = {
-  a = 'Audition',
-  b = 'Brave',
-  d = 'Dynalist',
-  e = 'Sublime Text',
-  n = 'Notion',
-  s = 'Telegram',
-  t = 'iTerm',
-  f = 'Clockify',
-  q = 'Premiere',
-  w = 'iA Writer',
+  -- a = 'Audition',
+  -- b = 'Brave',
+  -- d = 'Dynalist',
+  -- e = 'Sublime Text',
+  -- n = 'Notion',
+  -- s = 'Telegram',
+  -- t = 'iTerm',
+  -- f = 'Clockify',
+  -- q = 'Premiere',
+  -- w = 'iA Writer',
 }
 
 -- local KeyboardAsMidi = require("./KeyboardAsMidi"):new()
@@ -72,19 +78,19 @@ dynalist:start(AppWatcher)
 -- Moving Windows Around on Screen, onto other Screens, and to Spaces (left/right)
 local moveWindow = require("./moveWindow")
 
-hs.hotkey.bind({ 'control', 'option' }, "Up", function() moveWindow.maximize() end)
--- hs.hotkey.bind({ 'control', 'option' }, "Down", function() hs.window.frontmostWindow():minimize() end)
-hs.hotkey.bind({ 'control', 'option' }, "Left", function() moveWindow.move(0, 0, '50%', '100%') end)
-hs.hotkey.bind({ 'control', 'option' }, "Right", function() moveWindow.move('50%', 0, '50%', '100%') end)
+hs.hotkey.bind({ 'control', 'option' }, "up", function() moveWindow.maximize() end)
+-- hs.hotkey.bind({ 'control', 'option' }, "down", function() hs.window.frontmostWindow():minimize() end)
+hs.hotkey.bind({ 'control', 'option' }, "left", function() moveWindow.move(0, 0, '50%', '100%') end)
+hs.hotkey.bind({ 'control', 'option' }, "right", function() moveWindow.move('50%', 0, '50%', '100%') end)
 
 hs.hotkey.bind({ 'control', 'option' }, "1", function() moveWindow.move(0, 0, 960, '100%') end)
 hs.hotkey.bind({ 'control', 'option' }, "2", function() moveWindow.move(960, 0, 1920, '100%') end)
 hs.hotkey.bind({ 'control', 'option' }, "3", function() moveWindow.move(2880, 0, 960, '100%') end)
 
-hs.hotkey.bind({ 'control', 'option', 'command' }, "Up", function() moveWindow.center('90%', '90%') end)
-hs.hotkey.bind({ 'control', 'option', 'command' }, "Down", function() moveWindow.center(1920, 1080) end)
-hs.hotkey.bind({ 'control', 'option', 'command' }, "Left", function() moveWindow.move(0, '50%', '50%', '50%') end)
-hs.hotkey.bind({ 'control', 'option', 'command' }, "Right", function() moveWindow.move('50%', '50%', '50%', '50%') end)
+hs.hotkey.bind({ 'control', 'option', 'command' }, "up", function() moveWindow.center('90%', '90%') end)
+hs.hotkey.bind({ 'control', 'option', 'command' }, "down", function() moveWindow.center(1920, 1080) end)
+hs.hotkey.bind({ 'control', 'option', 'command' }, "left", function() moveWindow.move(0, '50%', '50%', '50%') end)
+hs.hotkey.bind({ 'control', 'option', 'command' }, "right", function() moveWindow.move('50%', '50%', '50%', '50%') end)
 
 hs.hotkey.bind({ 'control', 'option', 'command' }, "1", function() moveWindow.move(0, '50%', 960, '50%') end)
 hs.hotkey.bind({ 'control', 'option', 'command' }, "2", function() moveWindow.move(960, '50%', 1920, '50%') end)
@@ -93,17 +99,20 @@ hs.hotkey.bind({ 'control', 'option', 'command' }, "3", function() moveWindow.mo
 hs.hotkey.bind({ 'control', 'option', 'shift' }, "1", function() moveWindow.move(0, 0, 960, '50%') end)
 hs.hotkey.bind({ 'control', 'option', 'shift' }, "2", function() moveWindow.move(960, 0, 1920, '50%') end)
 hs.hotkey.bind({ 'control', 'option', 'shift' }, "3", function() moveWindow.move(2880, 0, 960, '50%') end)
+-- hs.hotkey.bind({ 'control', 'option', 'shift' }, "up", function() moveWindow.maximize() end)
+-- hs.hotkey.bind({ 'control', 'option', 'shift' }, "down", function() moveWindow.toNextScreen() end)
+hs.hotkey.bind({ 'control', 'option', 'shift' }, "left", function() moveWindow.move(0, 0, '50%', '50%') end)
+hs.hotkey.bind({ 'control', 'option', 'shift' }, "right", function() moveWindow.move('50%', 0, '50%', '50%') end)
 
-hs.hotkey.bind({ 'option', 'command' }, "Up", function() moveWindow.maximize() end)
-hs.hotkey.bind({ 'option', 'command' }, "Down", function() moveWindow.toNextScreen() end)
-hs.hotkey.bind({ 'option', 'command' }, "Left", function() moveWindow.move(0, 0, '50%', '100%') end)
-hs.hotkey.bind({ 'option', 'command' }, "Right", function() moveWindow.move('50%', 0, '50%', '100%') end)
-
+hs.hotkey.bind({ 'option', 'command' }, "up", function() moveWindow.maximize() end)
+hs.hotkey.bind({ 'option', 'command' }, "down", function() moveWindow.toNextScreen() end)
+hs.hotkey.bind({ 'option', 'command' }, "left", function() moveWindow.move(0, 0, '30%', '100%') end)
+hs.hotkey.bind({ 'option', 'command' }, "right", function() moveWindow.move('30%', 0, '70%', '100%') end)
 
 -- hs.hotkey.bind({ 'control', 'option', 'command', 'shift' }, "Up", function() moveWindow.maximize() end)
 -- hs.hotkey.bind({ 'control', 'option', 'command', 'shift' }, "Down", function() moveWindow.toNextScreen() end)
-hs.hotkey.bind({ 'control', 'option', 'command', 'shift' }, "Left", function() moveWindow.move(0, 0, '50%', '50%') end)
-hs.hotkey.bind({ 'control', 'option', 'command', 'shift' }, "Right", function() moveWindow.move('50%', 0, '50%', '50%') end)
+-- hs.hotkey.bind({ 'control', 'option', 'command', 'shift' }, "Left", function() moveWindow.move(0, 0, '50%', '50%') end)
+-- hs.hotkey.bind({ 'control', 'option', 'command', 'shift' }, "Right", function() moveWindow.move('50%', 0, '50%', '50%') end)
 
 -- hs.hotkey.bind({ 'control', 'command' }, "Up", function() moveWindow.maximize() end)
 -- hs.hotkey.bind({ 'control', 'command' }, "Down", function() moveWindow.toNextScreen() end)
@@ -120,31 +129,39 @@ col = hs.drawing.color.x11
 
 -- push-to-talk in Skype and Zoom
 -- Hold `fn` key to switch mute/talk
-spoon.SpoonInstall:andUse("PushToTalk", {
-  start = true,
-  config = {
-    detect_on_start = true,
-    app_switcher = {
-      ['zoom.us'] = 'push-to-talk',
-      ['Skype'] = 'push-to-talk'
-    }
-  }
-})
+-- spoon.SpoonInstall:andUse("PushToTalk", {
+--   start = true,
+--   config = {
+--     detect_on_start = true,
+--     app_switcher = {
+--       ['zoom.us'] = 'push-to-talk',
+--       ['Skype'] = 'push-to-talk'
+--     }
+--   }
+-- })
 
 -- Redirect URLS to different Browseres
 chromeBrowserApp = "com.google.Chrome"
 edgeBrowserApp = "com.microsoft.edgemac"
 braveBrowserApp = "com.brave.Browser"
-DefaultBrowser = braveBrowserApp
+safariBrowserApp = "com.apple.safari"
+DefaultBrowser = safariBrowserApp
 WorkBrowser = braveBrowserApp
 -- spoon.SpoonInstall:andUse("URLDispatcher", {
 --   config = {
 --     url_patterns = {
---       { "https?://*.accounts.google.com", braveBrowserApp },
---       { "https?://*.dropbox.com",  braveBrowserApp },
---       { "https?://*.zoom.us", braveBrowserApp },
+--       { "https?://(.*).accounts.google.com", braveBrowserApp },
+--       { "https?://(.*).dropbox.com",  braveBrowserApp },
+--       { "https?://(.*).zoom.us", braveBrowserApp },
+--       { "https?://(.*).youtube.com", braveBrowserApp },
+--       { "https?://(.*).youtube.de", braveBrowserApp },
+--       { "https?://(.*).drive.google.com", braveBrowserApp },
+--       { "https?://(.*).docs.google.com", braveBrowserApp },
+--       { "https?://(.*)chaptered.app", braveBrowserApp },
+--       { "https?://(.*).google.com", braveBrowserApp },
+--       { "https?://(.*).gmail.com", braveBrowserApp },
 --     },
---     default_handler = braveBrowserApp
+--     default_handler = safariBrowserApp
 --   },
 --   start = true,
 --   -- Enable debug logging if you get unexpected behavior
@@ -152,16 +169,16 @@ WorkBrowser = braveBrowserApp
 -- })
 
 -- Translate Selected Directly
-local wm = hs.webview.windowMasks
-spoon.SpoonInstall:andUse("DeepLTranslate", {
-  disable = false,
-  config = {
-    popup_style = wm.utility|wm.HUD|wm.titled|wm.closable|wm.resizable,
-  },
-  hotkeys = {
-    translate = { hyper, "z" },
-  }
-})
+-- local wm = hs.webview.windowMasks
+-- spoon.SpoonInstall:andUse("DeepLTranslate", {
+--   disable = false,
+--   config = {
+--     popup_style = wm.utility|wm.HUD|wm.titled|wm.closable|wm.resizable,
+--   },
+--   hotkeys = {
+--     translate = { hyper, "z" },
+--   }
+-- })
 
 -- Show shorcut cheat sheet
 spoon.SpoonInstall:andUse("KSheet", {})
@@ -176,28 +193,28 @@ spoon.SpoonInstall:andUse("MouseCircle", {
 })
 
 -- Menu Bar Flags
-spoon.SpoonInstall:andUse("MenubarFlag", {
-  config = {
-    colors = {
-      ["U.S."] = { },
-      German = { col.black, col.red, col.yellow },
-    }
-  },
-  start = true
-})
+-- spoon.SpoonInstall:andUse("MenubarFlag", {
+--   config = {
+--     colors = {
+--       ["U.S."] = { },
+--       German = { col.black, col.red, col.yellow },
+--     }
+--   },
+--   start = true
+-- })
 
 -- Show element browser to get to know stuff about it…
-local axbrowse = require("axbrowse")
-local lastApp
-hs.hotkey.bind({"cmd", "option", "control"}, "b", function()
-   local currentApp = hs.axuielement.applicationElement(hs.application.frontmostApplication())
-   if currentApp == lastApp then
-       axbrowse.browse() -- try to continue from where we left off
-   else
-       lastApp = currentApp
-       axbrowse.browse(currentApp) -- new app, so start over
-   end
-end)
+-- local axbrowse = require("axbrowse")
+-- local lastApp
+-- hs.hotkey.bind({"cmd", "option", "control"}, "b", function()
+--    local currentApp = hs.axuielement.applicationElement(hs.application.frontmostApplication())
+--    if currentApp == lastApp then
+--        axbrowse.browse() -- try to continue from where we left off
+--    else
+--        lastApp = currentApp
+--        axbrowse.browse(currentApp) -- new app, so start over
+--    end
+-- end)
 
 -- Toggle Capslock on and off.
 function toggleCaps()
@@ -296,26 +313,20 @@ end
 bindAppLauncherHotkeys(applicationHotkeys)
 
 -- Ping DNS Server for Network Round Trip Result
-function pingResult(object, message, seqnum, error)
-    if message == "didFinish" then
-        avg = tonumber(string.match(object:summary(), '/(%d+.%d+)/'))
-        if avg == 0.0 then
-            hs.alert.show("No network")
-        elseif avg < 200.0 then
-            hs.alert.show("Network good (" .. avg .. "ms)")
-        elseif avg < 500.0 then
-            hs.alert.show("Network poor(" .. avg .. "ms)")
-        else
-            hs.alert.show("Network bad(" .. avg .. "ms)")
-        end
-    end
-end
-hs.hotkey.bind(hyper, "p", function()
-    hs.network.ping.ping("8.8.8.8", 1, 0.01, 1.0, "any", pingResult)
-end)
-
-
--- hs.hotkey.bind(hyper, "k", function()
---   hs.execute([[nohup /usr/local/bin/kitty nano ~/.ssh/config 1>/dev/null 2>/dev/null & disown]])
+-- function pingResult(object, message, seqnum, error)
+--     if message == "didFinish" then
+--         avg = tonumber(string.match(object:summary(), '/(%d+.%d+)/'))
+--         if avg == 0.0 then
+--             hs.alert.show("No network")
+--         elseif avg < 200.0 then
+--             hs.alert.show("Network good (" .. avg .. "ms)")
+--         elseif avg < 500.0 then
+--             hs.alert.show("Network poor(" .. avg .. "ms)")
+--         else
+--             hs.alert.show("Network bad(" .. avg .. "ms)")
+--         end
+--     end
+-- end
+-- hs.hotkey.bind(hyper, "p", function()
+--     hs.network.ping.ping("8.8.8.8", 1, 0.01, 1.0, "any", pingResult)
 -- end)
-

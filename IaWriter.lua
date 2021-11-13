@@ -94,7 +94,7 @@ function Class:buildHotKeys()
   print('iAWriter:buildHotKeys')
   self.hotkeys = {
     ['copy formatted'] = hs.hotkey.new(hyper, 'c', function() hs.eventtap.keyStroke(option_cmd, "c", 200, self.frontApp) end),
-    ['move line up'] = hs.hotkey.new(control_cmd, 'up', function() hs.eventtap.keyStroke(option_cmd, "up", 200, self.frontApp) end),
+    ['move line up'] = hs.hotkey.new(control_cmd, 'up', function() print('move line up'); hs.eventtap.keyStroke(option_cmd, "up", 200, self.frontApp) end),
     ['move line down'] = hs.hotkey.new(control_cmd, 'down', function() hs.eventtap.keyStroke(option_cmd, "down", 200, self.frontApp) end),
     ['open dialog'] = hs.hotkey.new(comand, 'o', nil, function() hs.eventtap.keyStroke(shift_cmd, "o", 200, self.frontApp) end)
   }

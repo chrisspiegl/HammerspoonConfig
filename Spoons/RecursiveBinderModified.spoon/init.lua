@@ -3,8 +3,6 @@
 -- Add util.pairsSortedByKeys so the keys are sorted.
 local util = require('../util')
 
-
-
 --- === RecursiveBinder ===
 ---
 --- A spoon that let you bind sequential bindings.
@@ -76,62 +74,62 @@ obj.helperModifierMapping = {
 -- used by next model to close previous helper
 local previousHelperID = nil
 
+local upperTable = {
+   a='A',
+   b='B',
+   c='C',
+   d='D',
+   e='E',
+   f='F',
+   g='G',
+   h='H',
+   i='I',
+   j='J',
+   k='K',
+   l='L',
+   m='M',
+   n='N',
+   o='O',
+   p='P',
+   q='Q',
+   r='R',
+   s='S',
+   t='T',
+   u='U',
+   v='V',
+   w='W',
+   x='X',
+   y='Y',
+   z='Z',
+   ['`']='~',
+   ['1']='!',
+   ['2']='@',
+   ['3']='#',
+   ['4']='$',
+   ['5']='%',
+   ['6']='^',
+   ['7']='&',
+   ['8']='*',
+   ['9']='(',
+   ['0']=')',
+   ['-']='_',
+   ['=']='+',
+   ['[']='}',
+   [']']='}',
+   ['\\']='|',
+   [';']=':',
+   ['\'']='"',
+   [',']='<',
+   ['.']='>',
+   ['/']='?'
+}
 
 -- this function is used by helper to display 
 -- appropriate 'shift + key' bindings
 -- it turns a lower key to the corresponding
 -- upper key on keyboard
 local function keyboardUpper(key)
-   local upperTable = {
-    a='A', 
-    b='B', 
-    c='C', 
-    d='D', 
-    e='E', 
-    f='F', 
-    g='G', 
-    h='H', 
-    i='I', 
-    j='J', 
-    k='K', 
-    l='L', 
-    m='M', 
-    n='N', 
-    o='O', 
-    p='P', 
-    q='Q', 
-    r='R', 
-    s='S', 
-    t='T', 
-    u='U', 
-    v='V', 
-    w='W', 
-    x='X', 
-    y='Y', 
-    z='Z', 
-    ['`']='~',
-    ['1']='!',
-    ['2']='@',
-    ['3']='#',
-    ['4']='$',
-    ['5']='%',
-    ['6']='^',
-    ['7']='&',
-    ['8']='*',
-    ['9']='(',
-    ['0']=')',
-    ['-']='_',
-    ['=']='+',
-    ['[']='}',
-    [']']='}',
-    ['\\']='|',
-    [';']=':',
-    ['\'']='"',
-    [',']='<',
-    ['.']='>',
-    ['/']='?'
-   }
-   uppperKey = upperTable[key]
+   local uppperKey = upperTable[key]
    if uppperKey then
       return uppperKey
    else

@@ -228,7 +228,7 @@ end
 function util.isEqualColor(colorA, colorB)
   local foundEqual =  true
   for k, cA in pairs(colorA) do
-    if util.round(colorB[k], 2) - util.round(cA, 2) ~= 0 then
+    if util.round(colorB[k], 3) - util.round(cA, 3) ~= 0 then
       -- not equal, break, don't have to check other keys.
       foundEqual = false
       break
@@ -240,12 +240,18 @@ end
 
 -- Check if the colorAtPointer is equal to any of the ones in the colorDirectory
 function util.findEqualColorInTable(colorAtPointer, colorDirectory)
+  -- print('\n\n================\n\n')
+  -- print(hs.inspect(colorAtPointer))
+  -- print('\n\n')
   for key, colorCheck in pairs(colorDirectory) do
     -- if I end up here and the `foundEqual` is true then the color was found!
+    -- print(hs.inspect(colorCheck))
     if util.isEqualColor(colorCheck, colorAtPointer) then
+      -- print('found')
       return colorCheck -- return the found color!
     end -- don't have to check other colors since I already found my color
   end
+  -- print('notfound')
   return false
 end
 

@@ -95,6 +95,8 @@ function Class:buildHotKeys()
   self.hotkeys = {
     ['open/close list item up'] = hs.hotkey.new({ 'command', 'control' }, 'up', function() hs.eventtap.keyStroke({ 'command' }, ".", 200, self.frontApp) end),
     ['open/close list item down'] = hs.hotkey.new({ 'command', 'control' }, 'down', function() hs.eventtap.keyStroke({ 'command' }, ".", 200, self.frontApp) end),
+    ['open/close list item up2'] = hs.hotkey.new({ 'control' }, 'up', function() hs.eventtap.keyStroke({ 'command' }, ".", 200, self.frontApp) end),
+    ['open/close list item down2'] = hs.hotkey.new({ 'control' }, 'down', function() hs.eventtap.keyStroke({ 'command' }, ".", 200, self.frontApp) end),
     -- ['open dialog'] = hs.hotkey.new(comand, 'o', nil, function() hs.eventtap.keyStroke(shift_cmd, "o", 200, self.frontApp) end)
   }
 end

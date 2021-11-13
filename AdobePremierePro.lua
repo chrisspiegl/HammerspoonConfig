@@ -5,6 +5,12 @@
 --Control Shift Alt 6 = Audio Mixer
 --Control Shift Alt 7 = Effects
 
+-- Control Shift Alt I = Link Media
+-- Control Shift Alt O = Make Offline
+-- Control Shift Alt S = Move Playhead to Cursor
+-- Control Shift Alt N = Clip -> Nest
+
+
 local util = require('./util')
 local AppWatcher = require('./AppWatcher')
 spoon.SpoonInstall:andUse("RecursiveBinderModified")
@@ -19,6 +25,64 @@ function Class:constructor()
   self.eventtap = nil
   self.modal = nil
   self.hotkeys = nil
+
+  self.timelineColor = {
+    ['external - timeline above tracks'] = {
+      alpha = 1.0,
+      blue = 0.097136348485947,
+      green = 0.097157157957554,
+      red = 0.097141906619072
+    },
+    ['external - timeline empty track line'] = {
+      alpha = 1.0,
+      blue = 0.093614183366299,
+      green = 0.093634232878685,
+      red = 0.093619525432587
+    },
+    ['external - dark color in/out video tracks'] = {
+      alpha = 1.0,
+      blue = 0.083114176988602,
+      green = 0.08313199877739,
+      red = 0.083118915557861
+    },
+    ['external - light color in/out audio tracks'] = {
+      alpha = 1.0,
+      blue = 0.19546456634998,
+      green = 0.19550649821758,
+      red = 0.19547574222088
+    },
+    ['external - line between tracks'] = {
+      alpha = 1.0,
+      blue = 0.14378486573696,
+      green = 0.14381568133831,
+      red = 0.14379307627678
+    },
+    ['interenal - main timeline color'] = {
+      alpha = 1.0,
+      blue = 0.094983614981174,
+      green = 0.094594456255436,
+      red = 0.095025971531868
+    },
+    ['interenal - dark color in/out'] = {
+      alpha = 1.0,
+      blue = 0.081531174480915,
+      green = 0.0812017172575,
+      red = 0.081616684794426
+    },
+    ['interenal - light color in/out'] = {
+      alpha = 1.0,
+      blue = 0.19525930285454,
+      green = 0.19483198225498,
+      red = 0.19481739401817
+    },
+    ['interenal - line between tracks'] = {
+      alpha = 1.0,
+      blue = 0.173,
+      green = 0.173,
+      red = 0.173
+    },
+
+  }
 
   self:buildSingleKeys()
   self:buildHotKeys()
@@ -111,37 +175,11 @@ function Class:timelineMovePlayheadToMouse()
   end
   print(hs.inspect(colorAtPointer))
 
-  local timelineColor = {
-    ['main timeline color'] = {
-      alpha = 1.0,
-      blue = 0.094,
-      green = 0.094,
-      red = 0.094
-    },
-    ['dark color in/out'] = {
-      alpha = 1.0,
-      blue = 0.081,
-      green = 0.081,
-      red = 0.084
-    },
-    ['light color in/out'] = {
-      alpha = 1.0,
-      blue = 0.195,
-      green = 0.195,
-      red = 0.195
-    },
-    ['line between tracks'] = {
-      alpha = 1.0,
-      blue = 0.173,
-      green = 0.173,
-      red = 0.173
-    },
-  }
-
-  if util.findEqualColorInTable(colorAtPointer, timelineColor) ~= false then
-    print('test')
+  if util.findEqualColorInTable(colorAtPointer, self.timelineColor) ~= false then
+    hs.eventtap.keyStroke(nil, "escape", 200, self.frontApp) -- ESCAPE
+    -- self:focusPanel('timeline')
     hs.eventtap.middleClick(hs.mouse.absolutePosition()) -- MIDDLE CLICK TO FOCUS TIMELINE WINDOW
-    hs.eventtap.keyStroke(nil, "s", 200, self.frontApp) -- MOVE PLAYHEAD TO CURSOR
+    hs.eventtap.keyStroke(shift_hyp, "s", 200, self.frontApp) -- MOVE PLAYHEAD TO CURSOR
     -- return true
   end
   return false
@@ -193,11 +231,22 @@ end
 function Class:buildSingleKeys()
   print('AdobePremierePro:buildSingleKeys')
   local keyEventsForSingleKeys = {
+    ['s'] = function()
+      if not util.currentElementRoleIsTextFied() then
+        util.printAlert("Move Playhead")
+        hs.eventtap.keyStroke(nil, "escape", 200, self.frontApp) -- ESCAPE
+        self:focusPanel('timeline')
+        hs.eventtap.keyStroke(shift_hyp, "s", 200, self.frontApp) -- MOVE PLAYHEAD TO CURSOR
+        return true
+      end
+      return false
+    end,
     ['d'] = function()
       if not util.currentElementRoleIsTextFied() then
         util.printAlert("Move Playhead & Speedup")
-        self:focusPanel('timeline')
-        hs.eventtap.keyStroke(nil, "s", 200, self.frontApp) -- MOVE PLAYHEAD TO CURSOR
+        hs.eventtap.keyStroke(nil, "escape", 200, self.frontApp) -- ESCAPE
+        -- self:focusPanel('timeline')
+        hs.eventtap.keyStroke(shift_hyp, "s", 200, self.frontApp) -- MOVE PLAYHEAD TO CURSOR
         self:shuttleFaster()
         return true
       end
@@ -257,10 +306,18 @@ function Class:buildModal()
   self.modal = spoon.RecursiveBinderModified.recursiveBind({
     [singleKey('u', 'Unfocus Endcard')] = function()
       self:applyPreset('Unfocus Endcard v3') end,
+    [singleKey('w', 'Warp Stabilizer')] = function()
+      self:applyPreset('Warp Stabilizer') end,
     [singleKey('r', '200% to 220%')] = function()
       self:applyPreset('Zoom: 200% to 220%') end,
     [singleKey('t', '100% to 110%')] = function()
       self:applyPreset('Zoom: 100% to 110%') end,
+    [singleKey('n', 'Nest Clip')] = function()
+      hs.eventtap.keyStroke(shift_hyp, "n", 200, self.frontApp) end,
+    [singleKey('o', 'Make Offline')] = function()
+      hs.eventtap.keyStroke(shift_hyp, "o", 200, self.frontApp) end,
+    [singleKey('l', 'Link Media')] = function()
+      hs.eventtap.keyStroke(shift_hyp, "i", 200, self.frontApp) end,
     [singleKey('p', 'Panels+')] = {
       [singleKey('p', 'Projects')] = function() self:focusPanel('projects') end,
       [singleKey('t', 'Timeline')] = function() self:focusPanel('timeline') end,
