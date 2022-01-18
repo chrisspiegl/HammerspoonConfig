@@ -1,3 +1,8 @@
+local util = require('./util')
+
+-- TODO: possibly improve to handle window resizing as well?
+-- Resource for window resize tracking: https://gist.github.com/tmandry/a5b1ab6d6ea012c1e8c5
+
 local Class = require('_ClassSingleton')()
 function Class:constructor()
   print('AppWatcher:constructor')
@@ -62,7 +67,7 @@ function Class:checkInitialState(appBundleId)
   end
   -- Check if the app is the front most app and if so run `activated` function
   local frontAppBundleID = hs.application.frontmostApplication():bundleID()
-  if frontAppBundleID:find("^"..appBundleId) then
+  if frontAppBundleID:find("^("..appBundleId..")") then
     local fnActivated = currentApp[self.lookupAppWatchEvent[hs.application.watcher.activated]]
     fnActivated()
   end
@@ -72,10 +77,10 @@ function Class:buildEventtap()
   print('AppWatcher:buildEventtap')
   self.watcher = hs.application.watcher.new(function(appName, eventType, appObject)
     local appObjectBundleId = appObject:bundleID()
-    print(appObjectBundleId)
+    print("SWITCHING APP: " .. appObjectBundleId .. " - " .. eventType .. " - " .. self.lookupAppWatchEvent[eventType])
     if (appObjectBundleId == nil) then return end
     for appBundleId, appEventFunctions in pairs(self.apps) do
-      local appIsWatched = appObjectBundleId:find("^" .. appBundleId)
+      local appIsWatched = util.startsWith(appObjectBundleId, appBundleId)
       if (appIsWatched) then
         local fn = appEventFunctions[self.lookupAppWatchEvent[eventType]]
         if fn then fn() end

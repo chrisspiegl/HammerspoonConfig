@@ -111,7 +111,7 @@ function util.frontAppStartsWithBundleId(bundleID)
   local bundleID = bundleID or "XXXXXXXXXXX"
   local frontMostApp = hs.application.frontmostApplication()
   local frontAppBundleID = frontMostApp:bundleID()
-  if frontAppBundleID:find("^"..bundleID) then
+  if util:startsWith(frontAppBundleID) then
     return frontMostApp
   end
   return false
@@ -255,11 +255,11 @@ function util.findEqualColorInTable(colorAtPointer, colorDirectory)
   return false
 end
 
-function util.starts_with(str, start)
+function util.startsWith(str, start)
    return type(str) == 'string' and str:sub(1, #start) == start
 end
 
-function util.ends_with(str, ending)
+function util.endsWith(str, ending)
    return type(str) == 'string' and (ending == "" or str:sub(-#ending) == ending)
 end
 
