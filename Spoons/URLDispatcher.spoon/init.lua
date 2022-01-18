@@ -80,7 +80,7 @@ end
 
 function obj.matchapp(app, pat)
   obj.logger.df("Matching %s with %s", app, pat)
-  return string.find(app, "^"..pat.."$")
+  return string.find(app, "^("..pat..")$")
 end
 
 --- URLDispatcher:dispatchURL(scheme, host, params, fullUrl)
