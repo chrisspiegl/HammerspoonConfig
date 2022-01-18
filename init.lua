@@ -230,6 +230,11 @@ function toggleCaps()
   return
 end
 
+-- Toggle Full Screen Menu Bar on and off.
+function toggleFullScreenMenuBar()
+  hs.osascript.applescriptFromFile('./AppleScriptToggleFullScreenMenuBar.applescript')
+end
+
 -- Prevent Strange Space (` `) to be entered after using a `<alt>+…` shortcut.
 hs.hotkey.bind({'alt'}, 'space', function() hs.eventtap.keyStrokes(' ') end) -- an empty space is more reliably typed via keys since it is text we want to enter.
 hs.hotkey.bind({'alt', 'shift'}, 'space', function() hs.eventtap.keyStrokes(' ') end) -- an empty space is more reliably typed via keys since it is text we want to enter.
@@ -281,6 +286,7 @@ globalModal = spoon.RecursiveBinderModified.recursiveBind({
     [singleKey('m', 'MouseCircle')] = function() spoon.MouseCircle:toggle() end,
     [singleKey('/', 'Mic Toggle')] = function() spoon.PushToTalk:toggleStates({'push-to-talk', 'release-to-talk'}) end,
     [singleKey('c', 'Caps Lock')] = function() toggleCaps() end,
+    [singleKey('b', 'FS Menu Bar')] = function() toggleFullScreenMenuBar() end,
   },
   [singleKey('a', 'app+')] = modalAppsHotkeys,
   [singleKey('h', 'hammerspoon+')] = {
