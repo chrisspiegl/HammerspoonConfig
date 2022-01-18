@@ -9,6 +9,8 @@ x = Ripple Delete Time Selection in All Tracks
 q = Remove Shortcuts (Will be replaced by Ripple Delete to Last Clip)
 w = Remove Shortcuts (Will be replaced by Ripple Delete to Next Clip)
 
+control + option + shift + i = Set In Point to Playhead
+control + option + shift + o = Set Out Point to Playhead
 control + option + shift + c = Spit All Clips under Playhead
 control + option + shift + x = Ripple Delete Time Selection in All Tracks
 control + option + shift + k = Shuttle Stop
