@@ -1,5 +1,6 @@
 -- Load undocumented module for moving between spaces
-local spaces = require("hs._asm.undocumented.spaces")
+-- local spaces = require("hs._asm.undocumented.spaces")
+-- TODO: Fix moving between spaces
 
 local util = require('./util')
 
@@ -17,12 +18,12 @@ function moveWindow.move(x, y, w, h)
   local screenFrame = screen:absoluteToLocal(screen:frame())
   print(x,y,w,h)
   print(screenFrame)
-  if util.ends_with(x, '%') then x = screenFrame.w / 100 * tonumber(x:sub(1, #x - 1)) end
-  if util.ends_with(y, '%') then y = screenFrame.y + (screenFrame.h / 100 * tonumber(y:sub(1, #y - 1)))
+  if util.endsWith(x, '%') then x = screenFrame.w / 100 * tonumber(x:sub(1, #x - 1)) end
+  if util.endsWith(y, '%') then y = screenFrame.y + (screenFrame.h / 100 * tonumber(y:sub(1, #y - 1)))
   else y = screenFrame.y + y
   end
-  if util.ends_with(w, '%') then w = screenFrame.w / 100 * tonumber(w:sub(1, #w - 1)) end
-  if util.ends_with(h, '%') then h = screenFrame.h / 100 * tonumber(h:sub(1, #h - 1)) end
+  if util.endsWith(w, '%') then w = screenFrame.w / 100 * tonumber(w:sub(1, #w - 1)) end
+  if util.endsWith(h, '%') then h = screenFrame.h / 100 * tonumber(h:sub(1, #h - 1)) end
   -- Actually moving the window the it's place
   print(x,y,w,h)
   window:move(screen:localToAbsolute(x, y, w, h), false)
@@ -49,8 +50,8 @@ function moveWindow.center(w, h)
   local screen = window:screen()
   local screenFrame = screen:absoluteToLocal(screen:fullFrame())
   local windowFrame = window:frame()
-  if util.ends_with(w, '%') then w = screenFrame.w / 100 * tonumber(w:sub(1, #w - 1)) end
-  if util.ends_with(h, '%') then h = screenFrame.h / 100 * tonumber(h:sub(1, #h - 1)) end
+  if util.endsWith(w, '%') then w = screenFrame.w / 100 * tonumber(w:sub(1, #w - 1)) end
+  if util.endsWith(h, '%') then h = screenFrame.h / 100 * tonumber(h:sub(1, #h - 1)) end
   local x = screenFrame.w / 2 - w / 2
   local y = screenFrame.h / 2 - h / 2
   window:move(screen:localToAbsolute(x, y, w, h), false)
