@@ -57,6 +57,44 @@ function Class:constructor()
       green = 0.14381568133831,
       red = 0.14379307627678
     },
+
+    ['XDR - timeline above tracks'] = {
+      alpha = 1.0,
+      blue = 0.094971939921379,
+      green = 0.094971939921379,
+      red = 0.094971939921379
+    },
+    ['XDR - timeline empty track line'] = {
+      alpha = 1.0,
+      blue = 0.09775497764349,
+      green = 0.097364522516727,
+      red = 0.097376674413681
+    },
+    ['XDR - dark color in/out video tracks'] = {
+      alpha = 1.0,
+      blue = 0.083114176988602,
+      green = 0.08313199877739,
+      red = 0.083118915557861
+    },
+    ['XDR - light color in/out audio tracks'] = {
+      alpha = 1.0,
+      blue = 0.19546456634998,
+      green = 0.19550649821758,
+      red = 0.19547574222088
+    },
+    ['XDR - line between tracks'] = {
+      alpha = 1.0,
+      blue = 0.14444163441658,
+      green = 0.14401108026505,
+      red = 0.1440244615078
+    },
+    ['XDR - selected between tracks'] = {
+      alpha = 1.0,
+      blue = 0.84463649988174,
+      green = 0.84463655948639,
+      red = 0.84463655948639
+    },
+
     ['interenal - main timeline color'] = {
       alpha = 1.0,
       blue = 0.094983614981174,
