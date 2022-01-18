@@ -1,0 +1,23 @@
+{
+    "type": "module",
+    "scripts": {
+        "test": "xo --fix"
+    },
+    "opencv4nodejs": {
+        "disableAutoBuild": 1,
+        "opencvIncludeDir": "/opt/homebrew/Cellar/opencv/4.5.4_3/include",
+        "opencvLibDir": "/opt/homebrew/Cellar/opencv/4.5.4_3/lib",
+        "opencvBinDir": "/opt/homebrew/Cellar/opencv/4.5.4_3/bin",
+        "opencvDir": "/opt/homebrew/Cellar/opencv/4.5.4_3"
+    },
+    "dependencies": {
+        "@julusian/jpeg-turbo": "^1.1.1",
+        "@nut-tree/nut-js": "^2.0.1-next.20220117231322",
+        "meow": "^10.1.2",
+        "opencv4nodejs": "github:wandenberg/opencv4nodejs#change_compile_flags",
+        "run-node": "^2.0.0"
+    },
+    "devDependencies": {
+        "xo": "^0.47.0"
+    }
+}

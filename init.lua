@@ -69,6 +69,9 @@ premiere:start(AppWatcher)
 local audition = require('./AdobeAudition'):new()
 audition:start(AppWatcher)
 
+local davinciresolve = require('./DaVinciResolve'):new()
+davinciresolve:start(AppWatcher)
+
 local iawriter = require('./IaWriter'):new()
 iawriter:start(AppWatcher)
 
@@ -336,3 +339,20 @@ bindAppLauncherHotkeys(applicationHotkeys)
 -- hs.hotkey.bind(hyper, "p", function()
 --     hs.network.ping.ping("8.8.8.8", 1, 0.01, 1.0, "any", pingResult)
 -- end)
+
+
+-- Helper to get new colors from Premiere Pro
+
+-- hs.eventtap.new({ hs.eventtap.event.types.keyDown, hs.eventtap.event.types.leftMouseDown }, function(event)
+--   local currentModifiers = event:getFlags()
+--   local keyPressed = hs.keycodes.map[event:getKeyCode()]
+--   if event:getType() == hs.eventtap.event.types.leftMouseDown then
+--     print("\n\n\n --- NEW COLOR")
+--     local colorAtPointer = util.getColorAtMousePointer()
+--     if (not colorAtPointer) then
+--       return false
+--     end
+--     -- print(hs.inspect(colorAtPointer))
+--     print("\n\n\n")
+--   end
+-- end):start()
