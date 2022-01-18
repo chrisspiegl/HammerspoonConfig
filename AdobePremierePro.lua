@@ -1,15 +1,38 @@
 --Control Shift Alt B = Select Find Box (in Effects Panel)
+
+--Control Shift Alt 1 = Projects
+--Control Shift Alt 2 = Program Monitor
 --Control Shift Alt 3 = Timelines
---Control Shift Alt 5 = Effects Control
 --Control Shift Alt 4 = Lumetri Color
---Control Shift Alt 6 = Audio Mixer
+--Control Shift Alt 5 = Effects Control
+--Control Shift Alt 6 = Audio Track Mixer
 --Control Shift Alt 7 = Effects
 
 -- Control Shift Alt I = Link Media
 -- Control Shift Alt O = Make Offline
 -- Control Shift Alt S = Move Playhead to Cursor
 -- Control Shift Alt N = Clip -> Nest
+-- Control Shift Alt M = Markers
 
+-- Control Shift Alt G = Export Media
+-- Control Shift Alt H = Export Markers…
+-- Control Shift Alt M = Add Marker
+-- Control Shift Alt A = Deselect All
+-- Control Shift Alt J = Shuttle Left
+-- Control Shift Alt K = Shuttle Stop
+-- Control Shift Alt L = Shuttle Right
+-- Control Shift Alt Q = Ripple Trim Previous Edit to Playhead
+-- Control Shift Alt W = Ripple Trim Next Edit to Playhead
+
+-- X = Add Chapter Marker
+-- Control Shift Alt C = Add Edit to All Tracks
+-- C = Add Edit to All Tracks
+
+-- Z = *Must be Empty*
+-- B = *Must be Empty*
+-- M = *Must be Empty*
+-- D = *Must be Empty*
+-- S = *Must be Empty*
 
 local util = require('./util')
 local AppWatcher = require('./AppWatcher')
@@ -294,8 +317,8 @@ function Class:buildSingleKeys()
       if not util.currentElementRoleIsTextFied() then
         util.printAlert("Add Marker")
         self:focusPanel('timeline')
-        hs.eventtap.keyStroke({'shift', 'cmd'}, "a", 200, self.frontApp) -- DESELECT ALL
-        hs.eventtap.keyStroke({'option', 'shift'}, "m", 200, self.frontApp) -- ADD MARKER
+        hs.eventtap.keyStroke(shift_hyp, "a", 200, self.frontApp) -- DESELECT ALL
+        hs.eventtap.keyStroke(shift_hyp, "m", 200, self.frontApp) -- ADD MARKER
         return true
       end
       return false
@@ -369,15 +392,16 @@ function Class:buildModal()
         self:focusPanel('timeline')
         hs.eventtap.keyStroke(shift_hyp, "k", 200, self.frontApp) -- SHUTTLE STOP
         hs.eventtap.keyStroke(shift_hyp, "k", 200, self.frontApp) -- SHUTTLE STOP
-        hs.eventtap.keyStroke({'shift', 'cmd'}, "a", 200, self.frontApp) -- DESELECT ALL
-        hs.eventtap.keyStroke(shift_hyp, "m", 200, self.frontApp) -- EXPORT MARKERS
+        hs.eventtap.keyStroke(shift_hyp, "a", 200, self.frontApp) -- DESELECT ALL
+        hs.eventtap.keyStroke(shift_hyp, "h", 200, self.frontApp) -- EXPORT MARKERS
       end,
       [singleKey('e', 'Media')] = function()
         self:focusPanel('timeline')
         hs.eventtap.keyStroke(shift_hyp, "k", 200, self.frontApp) -- SHUTTLE STOP
         hs.eventtap.keyStroke(shift_hyp, "k", 200, self.frontApp) -- SHUTTLE STOP
-        hs.eventtap.keyStroke({'shift', 'cmd'}, "a", 200, self.frontApp) -- DESELECT ALL
-        hs.eventtap.keyStroke(shift_hyp, "e", 200, self.frontApp) -- EXPORT MEDIA
+        hs.eventtap.keyStroke(shift_hyp, "a", 200, self.frontApp) -- DESELECT ALL
+        hs.eventtap.keyStroke(shift_hyp, "g", 200, self.frontApp) -- EXPORT MEDIA
+        self:enableSingleKeys()
       end,
     },
   }, function() self:closeModal() end)
