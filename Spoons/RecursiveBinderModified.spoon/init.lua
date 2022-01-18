@@ -44,11 +44,13 @@ obj.helperEntryLengthInChar = 20
 ---             strokeColor={ white = 0, alpha = 2 },
 ---             textFont='SF Mono'
 ---             textSize=20}
-obj.helperFormat = {atScreenEdge=1,
-                    strokeColor={ white = 0, alpha = 2 },
-                    textFont='Inconsolata',
-                    textSize=20,
-                  radius=0}
+obj.helperFormat = {
+                  atScreenEdge=2,
+                  strokeColor={ white = 0, alpha = 2 },
+                  textFont='Inconsolata',
+                  textSize=20,
+                  radius=0
+               }
 
 --- RecursiveBinder.showBindHelper()
 --- Variable
@@ -124,7 +126,7 @@ local upperTable = {
    ['/']='?'
 }
 
--- this function is used by helper to display 
+-- this function is used by helper to display
 -- appropriate 'shift + key' bindings
 -- it turns a lower key to the corresponding
 -- upper key on keyboard
@@ -186,7 +188,7 @@ local function createKeyName(key)
             local modifier = modifierTable[count]
             if count == 1 then
                keyName = obj.helperModifierMapping[modifier]..' + '
-            else 
+            else
                keyName = keyName..obj.helperModifierMapping[modifier]..' + '
             end
          end
@@ -200,7 +202,7 @@ end
 local function showHelper(keyFuncNameTable)
    -- keyFuncNameTable is a table that key is key name and value is description
    local helper = ''
-   local separator = '' -- first loop doesn't need to add a separator, because it is in the very front. 
+   local separator = '' -- first loop doesn't need to add a separator, because it is in the very front.
    local lastLine = ''
    local count = 0
    for keyName, funcName in util.pairsSortedByKeys(keyFuncNameTable) do
@@ -244,7 +246,7 @@ end
 --- Spec of keymap:
 --- Every key is of format {{modifers}, key, (optional) description}
 --- The first two element is what you usually pass into a hs.hotkey.bind() function.
---- 
+---
 --- Each value of key can be in two form:
 --- 1. A function. Then pressing the key invokes the function
 --- 2. A table. Then pressing the key bring to another layer of keybindings.
@@ -268,7 +270,7 @@ function obj.recursiveBind(keymap, onClose)
    end)
    for key, map in pairs(keymap) do
       local func = obj.recursiveBind(map, onClose)
-      -- key[1] is modifiers, i.e. {'shift'}, key[2] is key, i.e. 'f' 
+      -- key[1] is modifiers, i.e. {'shift'}, key[2] is key, i.e. 'f'
       modal:bind(key[1], key[2], function()
          modal:exit()
          killHelper()
