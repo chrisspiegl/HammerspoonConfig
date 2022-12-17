@@ -1,50 +1,47 @@
+-- Control Option I = Clear In
+-- Control Option O = Clear Out
+
 -- Z = Fast Forward
--- Control Shift Alt Z = Fast Forward
+-- Control Shift Option Z = Fast Forward
 -- Arrow up = Playback > Previous > Clip
 -- Arrow down = Playback > Previous > Next
 
--- Control Shift Alt A = Deselect All
--- Control Shift Alt M = Add Marker - Blue
--- Control Shift Alt X = Add Marker - Green
+-- Control Shift Option A = Deselect All
+-- Control Shift Option M = Add Marker - Blue
+-- Control Shift Option X = Add Marker - Green
 
--- Control Shift Alt J = Play Reverse
--- Control Shift Alt K = Stop
--- Control Shift Alt L = Play Forward
--- Control Shift Alt Q = Trim > Ripple > Start to Playhead
--- Control Shift Alt W = Trim > Ripple > End to Playhead
--- Control Shift Alt C = Razor
+-- Control Shift Option J = Play Reverse
+-- Control Shift Option K = Stop
+-- Control Shift Option L = Play Forward
+-- Control Shift Option Q = Trim > Ripple > Start to Playhead
+-- Control Shift Option W = Trim > Ripple > End to Playhead
+-- Control Shift Option C = Razor
 
+-- Q = *Must be Empty*
+-- W = *Must be Empty*
 -- C = *Must be Empty*
 -- X = *Must be Empty*
 -- M = *Must be Empty*
--- Shift Left = *Must be Empty*
--- Shift Right = *Must be Empty*
+-- B = *Must be Empty*
+-- S = *Must be Empty*
+-- Option Left = *Must be Empty*
+-- Option Right = *Must be Empty*
 
+-- Command Right = Nudge > One Frame Right
+-- Command Left = Nudge > One Frame Left
 
 -- # NOTES FROM PREMIERE PRO
 
---Control Shift Alt B = Select Find Box (in Effects Panel)
+--Control Shift Option B = Select Find Box (in Effects Panel)
 
---Control Shift Alt 1 = Projects
---Control Shift Alt 2 = Program Monitor
---Control Shift Alt 3 = Timelines
---Control Shift Alt 4 = Lumetri Color
---Control Shift Alt 5 = Effects Control
---Control Shift Alt 6 = Audio Track Mixer
---Control Shift Alt 7 = Effects
+-- Control Shift Option I = Link Media
+-- Control Shift Option O = Make Offline
+-- Control Shift Option N = Clip -> Nest
 
--- Control Shift Alt I = Link Media
--- Control Shift Alt O = Make Offline
--- Control Shift Alt S = Move Playhead to Cursor
--- Control Shift Alt N = Clip -> Nest
+-- Control Shift Option G = Export Media
+-- Control Shift Option H = Export Markers…
 
--- Control Shift Alt G = Export Media
--- Control Shift Alt H = Export Markers…
--- Control Shift Alt M = Add Marker
-
--- B = *Must be Empty*
 -- D = *Must be Empty*
--- S = *Must be Empty*
 
 local util = require('./util')
 local AppWatcher = require('./AppWatcher')
@@ -73,10 +70,21 @@ function Class:constructor()
       blue = 0.13692550361156,
       green = 0.11698284745216,
       red = 0.11764259636402
+    },
+    ['external - default timeline color'] = {
+      alpha = 1.0,
+      blue = 0.15593829751015,
+      green = 0.13202676177025,
+      red = 0.13290430605412
+    },
+    ['external - selected timeline color'] = {
+      alpha = 1.0,
+      blue = 0.23018452525139,
+      green = 0.21366016566753,
+      red = 0.21424441039562
     }
   }
 
-  self.timelineMoveActive = false
   self.lastWindowFrame = nil
   self.targetPositions = {
     ['davinci-resolve-timeline-icon.png'] = {
@@ -143,12 +151,12 @@ function Class:buildAppWatcher()
   })
 end
 
-function Class:getTargetPositions()
+function Class:getTargetPositions(forced)
   local currentWindowFrame = hs.window.frontmostWindow():frame()
   print(hs.inspect(currentWindowFrame))
   print(hs.inspect(self.lastWindowFrame))
   print(hs.inspect(self.lastWindowFrame == currentWindowFrame))
-  if (self.lastWindowFrame and currentWindowFrame and currentWindowFrame == self.lastWindowFrame) then
+  if (not forced and self.lastWindowFrame and currentWindowFrame and currentWindowFrame == self.lastWindowFrame) then
     return
   else
     -- only process if the window frame changed
@@ -195,35 +203,34 @@ function Class:timelineMovePlayheadToMouseStart()
   print('DaVinciResolve:timelineMovePlayheadToMouse')
   local colorAtPointer = util.getColorAtMousePointer()
   if (not colorAtPointer) then
+    print('no color found at mouse pointer position')
     return false
   end
-  -- print(hs.inspect(colorAtPointer))
-
-  if util.findEqualColorInTable(colorAtPointer, self.timelineColor) ~= false then
-    if (self.targetPositions['davinci-resolve-timeline-icon.png'] and self.targetPositions['davinci-resolve-timeline-icon.png'].found) then
-      self.mouseDragEventTap = hs.eventtap.new({ hs.eventtap.event.types.leftMouseUp }, function(event)
-        print('up it goes')
-        self.eventtap:start()
-        self.mouseDragEventTap:stop()
-      end)
-      self.eventtap:stop()
-      self.mouseDragEventTap:start()
-
-      local targetPosition = self.targetPositions['davinci-resolve-timeline-icon.png']
-      local mouseBefore = hs.mouse.absolutePosition()
-
-      local posClick = {
-        x = mouseBefore.x,
-        y = targetPosition.y / targetPosition.pixelDensity + 27 * targetPosition.pixelDensity
-      }
-
-      self.timelineMoveActive = true
-      hs.eventtap.event.newMouseEvent(hs.eventtap.event.types.leftMouseDown, posClick):post() -- START DRAGING THE PRESET
-      hs.eventtap.event.newMouseEvent(hs.eventtap.event.types.leftMouseDown, mouseBefore):post() -- START DRAGING THE PRESET
-    end
-    return true
+  if util.findEqualColorInTable(colorAtPointer, self.timelineColor) == false then
+    print('the color was not found in the color match table, it actually was:')
+    print(hs.inspect(colorAtPointer))
+    return false
   end
-  return false
+  if (not self.targetPositions['davinci-resolve-timeline-icon.png'] or not self.targetPositions['davinci-resolve-timeline-icon.png'].found) then return false end
+  local targetPosition = self.targetPositions['davinci-resolve-timeline-icon.png']
+  local mouseBefore = hs.mouse.absolutePosition()
+  if (mouseBefore.y <= targetPosition.y / targetPosition.pixelDensity) then return false end
+  self.mouseDragEventTap = hs.eventtap.new({ hs.eventtap.event.types.leftMouseUp }, function(event)
+    -- print('up it goes')
+    self.eventtap:start()
+    self.mouseDragEventTap:stop()
+  end)
+  self.eventtap:stop()
+  self.mouseDragEventTap:start()
+
+  local posClick = {
+    x = mouseBefore.x,
+    y = targetPosition.y / targetPosition.pixelDensity + 27 * targetPosition.pixelDensity
+  }
+
+  hs.eventtap.event.newMouseEvent(hs.eventtap.event.types.leftMouseDown, posClick):post() -- START DRAGING THE PRESET
+  hs.eventtap.event.newMouseEvent(hs.eventtap.event.types.leftMouseDown, mouseBefore):post() -- START DRAGING THE PRESET
+  return true
 end
 
 function Class:movePlayheadToMouse()
@@ -252,11 +259,11 @@ function Class:buildHotKeys()
     --   hs.eventtap.keyStroke(shift_hyp, "c", 200, self.frontApp) -- RIPPLE DELETE TO LEFT
     --   self:shuttleFaster()
     -- end),
-    ['10 Frames Forward'] = hs.hotkey.new({'shift'}, 'left', function()
+    ['10 Frames Forward'] = hs.hotkey.new({'option'}, 'left', function()
       hs.eventtap.keyStroke(shift_hyp, "k", 200, self.frontApp) -- SHUTTLE STOP
       for i = 0, 10 do hs.eventtap.keyStroke({}, "left", 200, self.frontApp) end
     end),
-    ['10 Frames Backward'] = hs.hotkey.new({'shift'}, 'right', function()
+    ['10 Frames Backward'] = hs.hotkey.new({'option'}, 'right', function()
       hs.eventtap.keyStroke(shift_hyp, "k", 200, self.frontApp) -- SHUTTLE STOP
       for i = 0, 10 do hs.eventtap.keyStroke({}, "right", 200, self.frontApp) end
     end),
@@ -297,8 +304,25 @@ function Class:buildSingleKeys()
         hs.eventtap.keyStroke(nil, "escape", 200, self.frontApp) -- ESCAPE
         self:movePlayheadToMouse()
         return true
-      end
-      return false
+      else return false end
+    end,
+    ['q'] = function()
+      if not util.currentElementRoleIsTextFied() then
+        -- util.printAlert("Deslect All & Ripple Delete to Start")
+        hs.eventtap.keyStroke(nil, "escape", 200, self.frontApp)
+        hs.eventtap.keyStroke(shift_hyp, "a", 200, self.frontApp)
+        hs.eventtap.keyStroke(shift_hyp, "q", 200, self.frontApp)
+        return true
+      else return false end
+    end,
+    ['w'] = function()
+      if not util.currentElementRoleIsTextFied() then
+        -- util.printAlert("Deslect All & Ripple Delete to Start")
+        hs.eventtap.keyStroke(nil, "escape", 200, self.frontApp)
+        hs.eventtap.keyStroke(shift_hyp, "a", 200, self.frontApp)
+        hs.eventtap.keyStroke(shift_hyp, "w", 200, self.frontApp)
+        return true
+      else return false end
     end,
     ['d'] = function()
       if not util.currentElementRoleIsTextFied() then
@@ -312,8 +336,7 @@ function Class:buildSingleKeys()
           end)
         end)
         return true
-      end
-      return false
+      else return false end
     end,
     ['m'] = function()
       if not util.currentElementRoleIsTextFied() then
@@ -321,8 +344,7 @@ function Class:buildSingleKeys()
         hs.eventtap.keyStroke(shift_hyp, "a", 200, self.frontApp) -- DESELECT ALL
         hs.eventtap.keyStroke(shift_hyp, "m", 200, self.frontApp) -- ADD MARKER
         return true
-      end
-      return false
+      else return false end
     end,
     ['x'] = function()
       if not util.currentElementRoleIsTextFied() then
@@ -330,17 +352,16 @@ function Class:buildSingleKeys()
         hs.eventtap.keyStroke(shift_hyp, "a", 200, self.frontApp) -- DESELECT ALL
         hs.eventtap.keyStroke(shift_hyp, "x", 200, self.frontApp) -- ADD MARKER
         return true
-      end
-      return false
+      else return false end
     end,
     ['c'] = function()
       if not util.currentElementRoleIsTextFied() then
         util.printAlert("Cut Through All Tracks")
         hs.eventtap.keyStroke(shift_hyp, "a", 200, self.frontApp) -- DESELECT ALL
+        hs.eventtap.keyStroke(shift_hyp, "a", 200, self.frontApp) -- DESELECT ALL
         hs.eventtap.keyStroke(shift_hyp, "c", 200, self.frontApp) -- ADD MARKER
         return true
-      end
-      return false
+      else return false end
     end,
     -- ['z'] = function()
     --   if not util.currentElementRoleIsTextFied() then
@@ -351,13 +372,13 @@ function Class:buildSingleKeys()
     --   end
     --   return false -- propagate key
     -- end,
-    -- ['b'] = function()
-    --   if not util.currentElementRoleIsTextFied() then
-    --     self:openModal()
-    --     return true -- prevent default
-    --   end
-    --   return false -- propagate key
-    -- end,
+    ['b'] = function()
+      if not util.currentElementRoleIsTextFied() then
+        self:openModal()
+        return true -- prevent default
+      end
+      return false -- propagate key
+    end,
   }
   self.eventtap = hs.eventtap.new({ hs.eventtap.event.types.keyDown, hs.eventtap.event.types.leftMouseDown, hs.eventtap.event.types.leftMouseUp }, function(event)
     local currentModifiers = event:getFlags()
@@ -384,44 +405,46 @@ end
 function Class:buildModal()
   print('DaVinciResolve:buildModal')
   self.modal = spoon.RecursiveBinderModified.recursiveBind({
-    [singleKey('u', 'Unfocus Endcard')] = function()
-      self:applyPreset('Unfocus Endcard v3') end,
-    [singleKey('w', 'Warp Stabilizer')] = function()
-      self:applyPreset('Warp Stabilizer') end,
-    [singleKey('r', '200% to 220%')] = function()
-      self:applyPreset('Zoom: 200% to 220%') end,
-    [singleKey('t', '100% to 110%')] = function()
-      self:applyPreset('Zoom: 100% to 110%') end,
-    [singleKey('n', 'Nest Clip')] = function()
-      hs.eventtap.keyStroke(shift_hyp, "n", 200, self.frontApp) end,
-    [singleKey('o', 'Make Offline')] = function()
-      hs.eventtap.keyStroke(shift_hyp, "o", 200, self.frontApp) end,
-    [singleKey('l', 'Link Media')] = function()
-      hs.eventtap.keyStroke(shift_hyp, "i", 200, self.frontApp) end,
-    [singleKey('p', 'Panels+')] = {
-      [singleKey('p', 'Projects')] = function() self:focusPanel('projects') end,
-      [singleKey('t', 'Timeline')] = function() self:focusPanel('timeline') end,
-      [singleKey('l', 'Lumetri')] = function() self:focusPanel('lumetri') end,
-      [singleKey('c', 'Effects Control')] = function() self:focusPanel('effectsControl') end,
-      [singleKey('a', 'Audio Mixer')] = function() self:focusPanel('audioMixer') end,
-      [singleKey('e', 'Effects')] = function() self:focusPanel('effects') end,
-    },
-    [singleKey('e', 'Export+')] = {
-      [singleKey('m', 'Markers')] = function()
-        self:focusPanel('timeline')
-        hs.eventtap.keyStroke(shift_hyp, "k", 200, self.frontApp) -- SHUTTLE STOP
-        hs.eventtap.keyStroke(shift_hyp, "k", 200, self.frontApp) -- SHUTTLE STOP
-        hs.eventtap.keyStroke({'shift', 'cmd'}, "a", 200, self.frontApp) -- DESELECT ALL
-        hs.eventtap.keyStroke(shift_hyp, "m", 200, self.frontApp) -- EXPORT MARKERS
-      end,
-      [singleKey('e', 'Media')] = function()
-        self:focusPanel('timeline')
-        hs.eventtap.keyStroke(shift_hyp, "k", 200, self.frontApp) -- SHUTTLE STOP
-        hs.eventtap.keyStroke(shift_hyp, "k", 200, self.frontApp) -- SHUTTLE STOP
-        hs.eventtap.keyStroke({'shift', 'cmd'}, "a", 200, self.frontApp) -- DESELECT ALL
-        hs.eventtap.keyStroke(shift_hyp, "e", 200, self.frontApp) -- EXPORT MEDIA
-      end,
-    },
+    [singleKey('w', 'Recheck Timline Position')] = function()
+      self:getTargetPositions(true) end,
+    -- [singleKey('u', 'Unfocus Endcard')] = function()
+    --   self:applyPreset('Unfocus Endcard v3') end,
+    -- [singleKey('w', 'Warp Stabilizer')] = function()
+    --   self:applyPreset('Warp Stabilizer') end,
+    -- [singleKey('r', '200% to 220%')] = function()
+    --   self:applyPreset('Zoom: 200% to 220%') end,
+    -- [singleKey('t', '100% to 110%')] = function()
+    --   self:applyPreset('Zoom: 100% to 110%') end,
+    -- [singleKey('n', 'Nest Clip')] = function()
+    --   hs.eventtap.keyStroke(shift_hyp, "n", 200, self.frontApp) end,
+    -- [singleKey('o', 'Make Offline')] = function()
+    --   hs.eventtap.keyStroke(shift_hyp, "o", 200, self.frontApp) end,
+    -- [singleKey('l', 'Link Media')] = function()
+    --   hs.eventtap.keyStroke(shift_hyp, "i", 200, self.frontApp) end,
+    -- [singleKey('p', 'Panels+')] = {
+    --   [singleKey('p', 'Projects')] = function() self:focusPanel('projects') end,
+    --   [singleKey('t', 'Timeline')] = function() self:focusPanel('timeline') end,
+    --   [singleKey('l', 'Lumetri')] = function() self:focusPanel('lumetri') end,
+    --   [singleKey('c', 'Effects Control')] = function() self:focusPanel('effectsControl') end,
+    --   [singleKey('a', 'Audio Mixer')] = function() self:focusPanel('audioMixer') end,
+    --   [singleKey('e', 'Effects')] = function() self:focusPanel('effects') end,
+    -- },
+    -- [singleKey('e', 'Export+')] = {
+    --   [singleKey('m', 'Markers')] = function()
+    --     self:focusPanel('timeline')
+    --     hs.eventtap.keyStroke(shift_hyp, "k", 200, self.frontApp) -- SHUTTLE STOP
+    --     hs.eventtap.keyStroke(shift_hyp, "k", 200, self.frontApp) -- SHUTTLE STOP
+    --     hs.eventtap.keyStroke({'shift', 'cmd'}, "a", 200, self.frontApp) -- DESELECT ALL
+    --     hs.eventtap.keyStroke(shift_hyp, "m", 200, self.frontApp) -- EXPORT MARKERS
+    --   end,
+    --   [singleKey('e', 'Media')] = function()
+    --     self:focusPanel('timeline')
+    --     hs.eventtap.keyStroke(shift_hyp, "k", 200, self.frontApp) -- SHUTTLE STOP
+    --     hs.eventtap.keyStroke(shift_hyp, "k", 200, self.frontApp) -- SHUTTLE STOP
+    --     hs.eventtap.keyStroke({'shift', 'cmd'}, "a", 200, self.frontApp) -- DESELECT ALL
+    --     hs.eventtap.keyStroke(shift_hyp, "e", 200, self.frontApp) -- EXPORT MEDIA
+    --   end,
+    -- },
   }, function() self:closeModal() end)
 end
 

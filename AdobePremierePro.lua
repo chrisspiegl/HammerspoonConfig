@@ -1,19 +1,19 @@
---Control Shift Alt B = Select Find Box (in Effects Panel)
+-- Control Shift Alt B = Select Find Box (in Effects Panel)
 
---Control Shift Alt 1 = Projects
---Control Shift Alt 2 = Program Monitor
---Control Shift Alt 3 = Timelines
---Control Shift Alt 4 = Lumetri Color
---Control Shift Alt 5 = Effects Control
---Control Shift Alt 6 = Audio Track Mixer
---Control Shift Alt 7 = Effects
+-- Control Shift Alt 1 = Projects
+-- Control Shift Alt 2 = Program Monitor
+-- Control Shift Alt 3 = Timelines
+-- Control Shift Alt 4 = Lumetri Color
+-- Control Shift Alt 5 = Effects Control
+-- Control Shift Alt 6 = Audio Track Mixer
+-- Control Shift Alt 7 = Effects
 
 -- Control Shift Alt I = Link Media
 -- Control Shift Alt O = Make Offline
 -- Control Shift Alt S = Move Playhead to Cursor
 -- Control Shift Alt N = Clip -> Nest
--- Control Shift Alt M = Markers
 
+-- Control Shift Alt D = Delete Empty Tracks
 -- Control Shift Alt G = Export Media
 -- Control Shift Alt H = Export Markers…
 -- Control Shift Alt M = Add Marker
@@ -28,11 +28,11 @@
 -- Control Shift Alt C = Add Edit to All Tracks
 -- C = Add Edit to All Tracks
 
--- Z = *Must be Empty*
 -- B = *Must be Empty*
--- M = *Must be Empty*
 -- D = *Must be Empty*
+-- M = *Must be Empty*
 -- S = *Must be Empty*
+-- Z = *Must be Empty*
 
 local util = require('./util')
 local AppWatcher = require('./AppWatcher')
@@ -252,13 +252,13 @@ function Class:buildHotKeys()
     ['testing'] = hs.hotkey.new({'option'}, 'e', function()
       util.printAlert("TESTING CURRENTLY EMPTY")
     end),
-    ['cut and speedup'] = hs.hotkey.new({'option'}, 'c', function()
-      self:focusPanel('timeline')
-      hs.eventtap.keyStroke(shift_hyp, "k", 200, self.frontApp) -- SHUTTLE STOP
-      hs.eventtap.keyStroke(shift_hyp, "k", 200, self.frontApp) -- SHUTTLE STOP
-      hs.eventtap.keyStroke(shift_hyp, "c", 200, self.frontApp) -- RIPPLE DELETE TO LEFT
-      self:shuttleFaster()
-    end),
+    -- ['cut and speedup'] = hs.hotkey.new({'option'}, 'c', function()
+    --   self:focusPanel('timeline')
+    --   hs.eventtap.keyStroke(shift_hyp, "k", 200, self.frontApp) -- SHUTTLE STOP
+    --   hs.eventtap.keyStroke(shift_hyp, "k", 200, self.frontApp) -- SHUTTLE STOP
+    --   hs.eventtap.keyStroke(shift_hyp, "c", 200, self.frontApp) -- RIPPLE DELETE TO LEFT
+    --   self:shuttleFaster()
+    -- end),
     ['ripple to left with speedup'] = hs.hotkey.new({'option'}, 'q', function()
       self:focusPanel('timeline')
       hs.eventtap.keyStroke(shift_hyp, "k", 200, self.frontApp) -- SHUTTLE STOP
@@ -375,6 +375,8 @@ function Class:buildModal()
       self:applyPreset('Zoom: 100% to 110%') end,
     [singleKey('n', 'Nest Clip')] = function()
       hs.eventtap.keyStroke(shift_hyp, "n", 200, self.frontApp) end,
+    [singleKey('d', 'Delete Empty Tracks')] = function()
+      hs.eventtap.keyStroke(shift_hyp, "d", 200, self.frontApp) end,
     [singleKey('o', 'Make Offline')] = function()
       hs.eventtap.keyStroke(shift_hyp, "o", 200, self.frontApp) end,
     [singleKey('l', 'Link Media')] = function()

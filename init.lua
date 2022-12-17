@@ -69,8 +69,11 @@ premiere:start(AppWatcher)
 local audition = require('./AdobeAudition'):new()
 audition:start(AppWatcher)
 
-local davinciresolve = require('./DaVinciResolve'):new()
-davinciresolve:start(AppWatcher)
+local lightroom = require('./AdobeLightroomClassic'):new()
+lightroom:start(AppWatcher)
+
+-- local davinciresolve = require('./DaVinciResolve'):new()
+-- davinciresolve:start(AppWatcher)
 
 local iawriter = require('./IaWriter'):new()
 iawriter:start(AppWatcher)
@@ -81,46 +84,49 @@ dynalist:start(AppWatcher)
 -- Moving Windows Around on Screen, onto other Screens, and to Spaces (left/right)
 local moveWindow = require("./moveWindow")
 
-hs.hotkey.bind({ 'control', 'option' }, "up", function() moveWindow.maximize() end)
+hs.hotkey.bind({ 'control', 'option' }, "up", function() moveWindow.maximize() end) -- Maximise to full screen
 -- hs.hotkey.bind({ 'control', 'option' }, "down", function() hs.window.frontmostWindow():minimize() end)
-hs.hotkey.bind({ 'control', 'option' }, "left", function() moveWindow.move(0, 0, '50%', '100%') end)
-hs.hotkey.bind({ 'control', 'option' }, "right", function() moveWindow.move('50%', 0, '50%', '100%') end)
+hs.hotkey.bind({ 'control', 'option' }, "down", function() moveWindow.toNextScreen() end) -- Move to Next Screen
+hs.hotkey.bind({ 'control', 'option' }, "left", function() moveWindow.move(0, 0, '50%', '100%') end) -- Left Half
+hs.hotkey.bind({ 'control', 'option' }, "right", function() moveWindow.move('50%', 0, '50%', '100%') end) -- Right Half
 
-hs.hotkey.bind({ 'control', 'option' }, "1", function() moveWindow.move(0, 0, 960, '100%') end)
-hs.hotkey.bind({ 'control', 'option' }, "2", function() moveWindow.move(960, 0, 1920, '100%') end)
-hs.hotkey.bind({ 'control', 'option' }, "3", function() moveWindow.move(2880, 0, 960, '100%') end)
+hs.hotkey.bind({ 'control', 'option' }, "1", function() moveWindow.move(0, 0, 960, '100%') end) -- Ultrawide - Left
+hs.hotkey.bind({ 'control', 'option' }, "2", function() moveWindow.move(960, 0, 1920, '100%') end) -- Ultrawide - Center
+hs.hotkey.bind({ 'control', 'option' }, "3", function() moveWindow.move(2880, 0, 960, '100%') end) -- Ultrawide - Right
 
-hs.hotkey.bind({ 'control', 'option', 'command' }, "up", function() moveWindow.center('90%', '90%') end)
-hs.hotkey.bind({ 'control', 'option', 'command' }, "down", function() moveWindow.center(1920, 1080) end)
-hs.hotkey.bind({ 'control', 'option', 'command' }, "left", function() moveWindow.move(0, '50%', '50%', '50%') end)
-hs.hotkey.bind({ 'control', 'option', 'command' }, "right", function() moveWindow.move('50%', '50%', '50%', '50%') end)
+hs.hotkey.bind({ 'control', 'option', 'command' }, "up", function() moveWindow.center('90%', '90%') end) -- Center 90%
+hs.hotkey.bind({ 'control', 'option', 'command' }, "down", function() moveWindow.center(1920, 1080) end) -- Center Full-HD
+hs.hotkey.bind({ 'control', 'option', 'command' }, "left", function() moveWindow.move(0, '50%', '50%', '50%') end) -- Bottom Left Quarter
+hs.hotkey.bind({ 'control', 'option', 'command' }, "right", function() moveWindow.move('50%', '50%', '50%', '50%') end) -- Bottom Right Quarter
 
-hs.hotkey.bind({ 'control', 'option', 'command' }, "1", function() moveWindow.move(0, '50%', 960, '50%') end)
-hs.hotkey.bind({ 'control', 'option', 'command' }, "2", function() moveWindow.move(960, '50%', 1920, '50%') end)
-hs.hotkey.bind({ 'control', 'option', 'command' }, "3", function() moveWindow.move(2880, '50%', 960, '50%') end)
+hs.hotkey.bind({ 'control', 'option', 'command' }, "1", function() moveWindow.move(0, '50%', 960, '50%') end) -- Ultrawide - Top Left 50%
+hs.hotkey.bind({ 'control', 'option', 'command' }, "2", function() moveWindow.move(960, '50%', 1920, '50%') end) -- Ultrawide - Top Center 50%
+hs.hotkey.bind({ 'control', 'option', 'command' }, "3", function() moveWindow.move(2880, '50%', 960, '50%') end) -- Ultrawide - Top Right 50%
 
-hs.hotkey.bind({ 'control', 'option', 'shift' }, "1", function() moveWindow.move(0, 0, 960, '50%') end)
-hs.hotkey.bind({ 'control', 'option', 'shift' }, "2", function() moveWindow.move(960, 0, 1920, '50%') end)
-hs.hotkey.bind({ 'control', 'option', 'shift' }, "3", function() moveWindow.move(2880, 0, 960, '50%') end)
--- hs.hotkey.bind({ 'control', 'option', 'shift' }, "up", function() moveWindow.maximize() end)
--- hs.hotkey.bind({ 'control', 'option', 'shift' }, "down", function() moveWindow.toNextScreen() end)
-hs.hotkey.bind({ 'control', 'option', 'shift' }, "left", function() moveWindow.move(0, 0, '50%', '50%') end)
-hs.hotkey.bind({ 'control', 'option', 'shift' }, "right", function() moveWindow.move('50%', 0, '50%', '50%') end)
+hs.hotkey.bind({ 'control', 'option', 'shift' }, "1", function() moveWindow.move(0, 0, 960, '50%') end) -- Ultrawide - Bottom Left 50%
+hs.hotkey.bind({ 'control', 'option', 'shift' }, "2", function() moveWindow.move(960, 0, 1920, '50%') end) -- Ultrawide - Bottom Center 50%
+hs.hotkey.bind({ 'control', 'option', 'shift' }, "3", function() moveWindow.move(2880, 0, 960, '50%') end) -- Ultrawide - Bottom Right 50%
+-- hs.hotkey.bind({ 'control', 'option', 'shift' }, "up", function() moveWindow.move(0, 0, '100%', '50%') end) -- Top Half
+-- hs.hotkey.bind({ 'control', 'option', 'shift' }, "down", function() moveWindow.move(0, '50%', '100%', '50%') end) -- Bottom Half
+hs.hotkey.bind({ 'control', 'option', 'shift' }, "left", function() moveWindow.move(0, 0, '50%', '50%') end) -- Top Left Quarter
+hs.hotkey.bind({ 'control', 'option', 'shift' }, "right", function() moveWindow.move('50%', 0, '50%', '50%') end) -- Top Right Quarter
 
-hs.hotkey.bind({ 'option', 'command' }, "up", function() moveWindow.maximize() end)
-hs.hotkey.bind({ 'option', 'command' }, "down", function() moveWindow.toNextScreen() end)
-hs.hotkey.bind({ 'option', 'command' }, "left", function() moveWindow.move(0, 0, '30%', '100%') end)
-hs.hotkey.bind({ 'option', 'command' }, "right", function() moveWindow.move('30%', 0, '70%', '100%') end)
+-- hs.hotkey.bind({ 'option', 'command' }, "up", function() moveWindow.maximize() end) -- Maximise to full screen
+hs.hotkey.bind({ 'option', 'command' }, "up", function() moveWindow.move(0, 0, '100%', '50%') end) -- Top Half
+-- hs.hotkey.bind({ 'option', 'command' }, "down", function() moveWindow.toNextScreen() end) -- Move to Next Screen
+hs.hotkey.bind({ 'option', 'command' }, "down", function() moveWindow.move(0, '50%', '100%', '50%') end) -- Bottom Half
+hs.hotkey.bind({ 'option', 'command' }, "left", function() moveWindow.move(0, 0, '30%', '100%') end) -- Left 1/3
+hs.hotkey.bind({ 'option', 'command' }, "right", function() moveWindow.move('30%', 0, '70%', '100%') end) -- Right 2/3
 
 -- hs.hotkey.bind({ 'control', 'option', 'command', 'shift' }, "Up", function() moveWindow.maximize() end)
 -- hs.hotkey.bind({ 'control', 'option', 'command', 'shift' }, "Down", function() moveWindow.toNextScreen() end)
 -- hs.hotkey.bind({ 'control', 'option', 'command', 'shift' }, "Left", function() moveWindow.move(0, 0, '50%', '50%') end)
 -- hs.hotkey.bind({ 'control', 'option', 'command', 'shift' }, "Right", function() moveWindow.move('50%', 0, '50%', '50%') end)
 
--- hs.hotkey.bind({ 'control', 'command' }, "Up", function() moveWindow.maximize() end)
--- hs.hotkey.bind({ 'control', 'command' }, "Down", function() moveWindow.toNextScreen() end)
-hs.hotkey.bind({ 'control', 'command' }, "Left", function() moveWindow.oneSpace("left", true) end)
-hs.hotkey.bind({ 'control', 'command' }, "Right", function() moveWindow.oneSpace("right", true) end)
+-- hs.hotkey.bind({ 'control', 'command' }, "up", function() moveWindow.maximize() end)
+-- hs.hotkey.bind({ 'control', 'command' }, "down", function() moveWindow.toNextScreen() end)
+hs.hotkey.bind({ 'control', 'command' }, "left", function() moveWindow.oneSpace("left", true) end)
+hs.hotkey.bind({ 'control', 'command' }, "right", function() moveWindow.oneSpace("right", true) end)
 
 
 -- Color Presets
