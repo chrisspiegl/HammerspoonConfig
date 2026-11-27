@@ -60,27 +60,35 @@ end
 
 function Class:checkInitialState(appBundleId)
   local currentApp = self.apps[appBundleId]
-  -- Cheeck if the app is running on initiation and if so run the `launched` function
-  if next(hs.application.applicationsForBundleID(appBundleId)) ~= nil then
-    local fnLaunched = currentApp[self.lookupAppWatchEvent[hs.application.watcher.launched]]
-    fnLaunched()
+  -- Prefix match: Beta uses a distinct full bundle id (e.g. …PremierePro.Beta); applicationsForBundleID is exact-only.
+  local anyRunning = false
+  for _, app in pairs(hs.application.runningApplications()) do
+    local bid = app:bundleID()
+    if bid and util.bundleIdHasPrefix(bid, appBundleId) then
+      anyRunning = true
+      break
+    end
   end
-  -- Check if the app is the front most app and if so run `activated` function
-  local frontAppBundleID = hs.application.frontmostApplication():bundleID()
-  if frontAppBundleID:find("^("..appBundleId..")") then
+  if anyRunning then
+    local fnLaunched = currentApp[self.lookupAppWatchEvent[hs.application.watcher.launched]]
+    if fnLaunched then fnLaunched() end
+  end
+  local frontApp = hs.application.frontmostApplication()
+  local frontAppBundleID = frontApp and frontApp:bundleID()
+  if frontAppBundleID and util.bundleIdHasPrefix(frontAppBundleID, appBundleId) then
     local fnActivated = currentApp[self.lookupAppWatchEvent[hs.application.watcher.activated]]
-    fnActivated()
+    if fnActivated then fnActivated() end
   end
 end
 
 function Class:buildEventtap()
   print('AppWatcher:buildEventtap')
   self.watcher = hs.application.watcher.new(function(appName, eventType, appObject)
-    local appObjectBundleId = appObject:bundleID()
+    local appObjectBundleId = appObject and appObject:bundleID()
+    if appObjectBundleId == nil then return end
     print("SWITCHING APP: " .. appObjectBundleId .. " - " .. eventType .. " - " .. self.lookupAppWatchEvent[eventType])
-    if (appObjectBundleId == nil) then return end
     for appBundleId, appEventFunctions in pairs(self.apps) do
-      local appIsWatched = util.startsWith(appObjectBundleId, appBundleId)
+      local appIsWatched = util.bundleIdHasPrefix(appObjectBundleId, appBundleId)
       if (appIsWatched) then
         local fn = appEventFunctions[self.lookupAppWatchEvent[eventType]]
         if fn then fn() end

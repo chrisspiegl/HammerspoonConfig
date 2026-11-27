@@ -41,12 +41,32 @@ end
 function util.timerStart()
   return hs.timer.absoluteTime()
 end
--- STOP TIMERR by giving it the start time and you'll get the difference in milliseconds returned
+-- STOP TIMER by giving it the start time and you'll get the difference in milliseconds returned
 function util.timerStop(timer)
   local endTime = hs.timer.absoluteTime()
   local diffNs = endTime - timer
   local diffMs = diffNs / 1000000
   return diffMs
+end
+
+util.singleKeyShortcutsAlertStyle = {
+  radius = 0,
+  atScreenEdge = 2,
+  strokeColor = { white = 1, alpha = 0 },
+  fadeInDuration = 0,
+  fadeOutDuration = 0,
+  strokeWidth = 0,
+  textSize = 12,
+}
+util.singleKeyShortcutsActive = true
+function util.toggleSingleKeyShortcuts()
+  if (util.singleKeyShortcutsActive) then
+    util.singleKeyShortcutsAlert = hs.alert('Single Key Shortcuts Deactivated', util.singleKeyShortcutsAlertStyle, 'indefinite')
+    util.singleKeyShortcutsActive = false
+  else
+    hs.alert.closeSpecific(util.singleKeyShortcutsAlert)
+    util.singleKeyShortcutsActive = true
+  end
 end
 
 -- Do Keystroke
@@ -105,13 +125,21 @@ function util.frontAppIs(appName)
   return util.frontAppStartsWithBundleId(bundleId)
 end
 
+-- True if bundleId begins with prefix (release + Beta builds; case-insensitive for the prefix match).
+function util.bundleIdHasPrefix(bundleId, prefix)
+  if type(bundleId) ~= 'string' or type(prefix) ~= 'string' then return false end
+  local prefixLower = prefix:lower()
+  return bundleId:lower():sub(1, #prefixLower) == prefixLower
+end
+
 -- Check if the Frontmost Application has a certain `bundleID`
 -- Returns the `frontmostApplication` or `false`
 function util.frontAppStartsWithBundleId(bundleID)
   local bundleID = bundleID or "XXXXXXXXXXX"
   local frontMostApp = hs.application.frontmostApplication()
+  if not frontMostApp then return false end
   local frontAppBundleID = frontMostApp:bundleID()
-  if util.startsWith(frontAppBundleID, bundleID) then
+  if util.bundleIdHasPrefix(frontAppBundleID, bundleID) then
     return frontMostApp
   end
   return false
@@ -148,6 +176,15 @@ function util.currentElement()
   return systemElement:attributeValue("AXFocusedUIElement") -- Select Focused Element
 end
 
+-- True when focus is in a text/search field (typing). Many apps (e.g. Premiere Beta) still report a
+-- non-nil AXFocusedUIElement for the timeline or panels, so "nil == currentElement()" is too strict.
+function util.focusedElementIsTextField()
+  local el = util.currentElement()
+  if not el then return false end
+  local role = el:attributeValue("AXRole")
+  return role == "AXTextField" or role == "AXTextArea" or role == "AXSearchField"
+end
+
 -- Get the curreent UI Element Role
 -- False if no role found or no element has focus.
 function util.currentElementValue(currentElement)
@@ -179,6 +216,8 @@ end
 -- Returns `Focused UI Element` if it is a text field.
 function util.currentElementRoleIsTextFied(currentElement)
   currentElement = currentElement or util.currentElement()
+  print('ELEMENT:')
+  print(currentElement)
   if currentElement then
     local AXRole = currentElement:attributeValue("AXRole")
     if AXRole == 'AXTextField' then

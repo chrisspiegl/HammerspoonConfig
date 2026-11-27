@@ -183,7 +183,12 @@ function Class:buildEventtap()
         self.previousKey = nil
         self.definedActionKey:lower()
         return self:releasedActionKey()
+    elseif keyPressed == self.definedActionKey:lower() then
+      -- ignore following HyperKey Presses
+      -- print('ignore')
+      return true 
     end
+    -- print('outside')
     return false
   end)
   self.eventtap:start()
@@ -194,7 +199,9 @@ function Class:pressedActionKey()
   self.triggered = false
   self.modal:enter()
   self.alert = hs.alert('HYPER ACTIVE', self.hyperAlertStyle, 'indefinite')
-  return false
+  -- NOTE (2024-07-19): changed the `false` to `true` which means the previous event should be deleted and not propagated.
+  -- This is an experiment if it affects Photoshop at all in handling this better (Firstly, a boolean, true if the event should be deleted, false if it should propagate to any other applications watching for that event. Secondly, a table of events to post.)
+  return true
 end
 
 -- Leave Hyper Mode when F18 (Hyper/Capslock) is pressed,
@@ -205,7 +212,9 @@ function Class:releasedActionKey()
   if not self.triggered then
     -- hs.eventtap.keyStroke({}, 'ESCAPE')
     hs.alert('ESCAPE', self.hyperAlertStyle, 1)
-    return false , { -- using the surrounding eventtap is more reliable to send these keys than with the `doKeystroke` or simple `eventtap.keystroke`
+    -- NOTE (2024-07-19): changed the `false` to `true` which means the previous event should be deleted and not propagated.
+    -- This is an experiment if it affects Photoshop at all in handling this better (Firstly, a boolean, true if the event should be deleted, false if it should propagate to any other applications watching for that event. Secondly, a table of events to post.)
+    return true, { -- using the surrounding eventtap is more reliable to send these keys than with the `doKeystroke` or simple `eventtap.keystroke`
       hs.eventtap.event.newKeyEvent({}, 'escape', true),
       hs.eventtap.event.newKeyEvent({}, 'escape', false),
     }

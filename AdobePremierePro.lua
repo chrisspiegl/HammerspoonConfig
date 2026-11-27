@@ -42,6 +42,7 @@ singleKey = spoon.RecursiveBinderModified.singleKey
 local Class = require('./_ClassSingleton')()
 function Class:constructor()
   print('AdobePremierePro:Constructor')
+  -- Watcher prefix: matches release (`com.adobe.PremierePro`) and Beta (`com.adobe.PremierePro…`).
   self.bundleId = 'com.adobe.PremierePro'
   self.watcher = nil
   self.frontApp = nil
@@ -50,99 +51,128 @@ function Class:constructor()
   self.hotkeys = nil
 
   self.timelineColor = {
-    ['external - timeline above tracks'] = {
-      alpha = 1.0,
-      blue = 0.097136348485947,
-      green = 0.097157157957554,
-      red = 0.097141906619072
-    },
-    ['external - timeline empty track line'] = {
-      alpha = 1.0,
-      blue = 0.093614183366299,
-      green = 0.093634232878685,
-      red = 0.093619525432587
-    },
-    ['external - dark color in/out video tracks'] = {
-      alpha = 1.0,
-      blue = 0.083114176988602,
-      green = 0.08313199877739,
-      red = 0.083118915557861
-    },
-    ['external - light color in/out audio tracks'] = {
-      alpha = 1.0,
-      blue = 0.19546456634998,
-      green = 0.19550649821758,
-      red = 0.19547574222088
-    },
-    ['external - line between tracks'] = {
-      alpha = 1.0,
-      blue = 0.14378486573696,
-      green = 0.14381568133831,
-      red = 0.14379307627678
-    },
+    -- ['internal M1 Max - timeline above tracks'] = {
+    --   alpha = 1.0,
+    --   blue = 0.11372549019608,
+    --   green = 0.11372549019608,
+    --   red = 0.11372549019608
+    -- },
+    -- ['internal M1 Max - timeline empty track line'] = {
+    --   alpha = 1.0,
+    --   blue = 0.12549019607843,
+    --   green = 0.12549019607843,
+    --   red = 0.12549019607843
+    -- },
+    -- ['internal M1 Max - dark color in/out video tracks'] = {
+    --   alpha = 1.0,
+    --   blue = 0.10588235294118,
+    --   green = 0.10588235294118,
+    --   red = 0.10980392156863
+    -- },
+    -- ['internal M1 Max - light color in/out audio tracks'] = {
+    --   alpha = 1.0,
+    --   blue = 0.25882352941176,
+    --   green = 0.25490196078431,
+    --   red = 0.25882352941176
+    -- },
+    -- ['internal M1 Max - line between tracks'] = {
+    --   alpha = 1.0,
+    --   blue = 0.1921568627451,
+    --   green = 0.1921568627451,
+    --   red = 0.1921568627451
+    -- },
+    -- ['external - timeline above tracks'] = {
+    --   alpha = 1.0,
+    --   blue = 0.097136348485947,
+    --   green = 0.097157157957554,
+    --   red = 0.097141906619072
+    -- },
+    -- ['external - timeline empty track line'] = {
+    --   alpha = 1.0,
+    --   blue = 0.093614183366299,
+    --   green = 0.093634232878685,
+    --   red = 0.093619525432587
+    -- },
+    -- ['external - dark color in/out video tracks'] = {
+    --   alpha = 1.0,
+    --   blue = 0.083114176988602,
+    --   green = 0.08313199877739,
+    --   red = 0.083118915557861
+    -- },
+    -- ['external - light color in/out audio tracks'] = {
+    --   alpha = 1.0,
+    --   blue = 0.19546456634998,
+    --   green = 0.19550649821758,
+    --   red = 0.19547574222088
+    -- },
+    -- ['external - line between tracks'] = {
+    --   alpha = 1.0,
+    --   blue = 0.14378486573696,
+    --   green = 0.14381568133831,
+    --   red = 0.14379307627678
+    -- },
 
-    ['XDR - timeline above tracks'] = {
-      alpha = 1.0,
-      blue = 0.094971939921379,
-      green = 0.094971939921379,
-      red = 0.094971939921379
-    },
-    ['XDR - timeline empty track line'] = {
-      alpha = 1.0,
-      blue = 0.09775497764349,
-      green = 0.097364522516727,
-      red = 0.097376674413681
-    },
-    ['XDR - dark color in/out video tracks'] = {
-      alpha = 1.0,
-      blue = 0.083114176988602,
-      green = 0.08313199877739,
-      red = 0.083118915557861
-    },
-    ['XDR - light color in/out audio tracks'] = {
-      alpha = 1.0,
-      blue = 0.19546456634998,
-      green = 0.19550649821758,
-      red = 0.19547574222088
-    },
-    ['XDR - line between tracks'] = {
-      alpha = 1.0,
-      blue = 0.14444163441658,
-      green = 0.14401108026505,
-      red = 0.1440244615078
-    },
-    ['XDR - selected between tracks'] = {
-      alpha = 1.0,
-      blue = 0.84463649988174,
-      green = 0.84463655948639,
-      red = 0.84463655948639
-    },
+    -- ['XDR - timeline above tracks'] = {
+    --   alpha = 1.0,
+    --   blue = 0.094971939921379,
+    --   green = 0.094971939921379,
+    --   red = 0.094971939921379
+    -- },
+    -- ['XDR - timeline empty track line'] = {
+    --   alpha = 1.0,
+    --   blue = 0.09775497764349,
+    --   green = 0.097364522516727,
+    --   red = 0.097376674413681
+    -- },
+    -- ['XDR - dark color in/out video tracks'] = {
+    --   alpha = 1.0,
+    --   blue = 0.083114176988602,
+    --   green = 0.08313199877739,
+    --   red = 0.083118915557861
+    -- },
+    -- ['XDR - light color in/out audio tracks'] = {
+    --   alpha = 1.0,
+    --   blue = 0.19546456634998,
+    --   green = 0.19550649821758,
+    --   red = 0.19547574222088
+    -- },
+    -- ['XDR - line between tracks'] = {
+    --   alpha = 1.0,
+    --   blue = 0.14444163441658,
+    --   green = 0.14401108026505,
+    --   red = 0.1440244615078
+    -- },
+    -- ['XDR - selected between tracks'] = {
+    --   alpha = 1.0,
+    --   blue = 0.84463649988174,
+    --   green = 0.84463655948639,
+    --   red = 0.84463655948639
+    -- },
 
-    ['interenal - main timeline color'] = {
-      alpha = 1.0,
-      blue = 0.094983614981174,
-      green = 0.094594456255436,
-      red = 0.095025971531868
-    },
-    ['interenal - dark color in/out'] = {
-      alpha = 1.0,
-      blue = 0.081531174480915,
-      green = 0.0812017172575,
-      red = 0.081616684794426
-    },
-    ['interenal - light color in/out'] = {
-      alpha = 1.0,
-      blue = 0.19525930285454,
-      green = 0.19483198225498,
-      red = 0.19481739401817
-    },
-    ['interenal - line between tracks'] = {
-      alpha = 1.0,
-      blue = 0.173,
-      green = 0.173,
-      red = 0.173
-    },
-
+    -- ['interenal - main timeline color'] = {
+    --   alpha = 1.0,
+    --   blue = 0.094983614981174,
+    --   green = 0.094594456255436,
+    --   red = 0.095025971531868
+    -- },
+    -- ['interenal - dark color in/out'] = {
+    --   alpha = 1.0,
+    --   blue = 0.081531174480915,
+    --   green = 0.0812017172575,
+    --   red = 0.081616684794426
+    -- },
+    -- ['interenal - light color in/out'] = {
+    --   alpha = 1.0,
+    --   blue = 0.19525930285454,
+    --   green = 0.19483198225498,
+    --   red = 0.19481739401817
+    -- },
+    -- ['interenal - line between tracks'] = {
+    --   alpha = 1.0,
+    --   blue = 0.173,
+    --   green = 0.173,
+    --   red = 0.173
+    -- },
   }
 
   self:buildSingleKeys()
@@ -174,7 +204,7 @@ end
 
 function Class:activated()
   print('AdobePremierePro:activated')
-  self.frontApp = util.frontAppIs(self.bundleId)
+  self.frontApp = util.frontAppStartsWithBundleId(self.bundleId)
   self:enableSingleKeys()
   self:enableHotKeys()
 end
@@ -234,24 +264,24 @@ function Class:timelineMovePlayheadToMouse()
   if (not colorAtPointer) then
     return false
   end
-  print(hs.inspect(colorAtPointer))
+  -- print(hs.inspect(colorAtPointer))
 
-  if util.findEqualColorInTable(colorAtPointer, self.timelineColor) ~= false then
-    hs.eventtap.keyStroke(nil, "escape", 200, self.frontApp) -- ESCAPE
-    -- self:focusPanel('timeline')
-    hs.eventtap.middleClick(hs.mouse.absolutePosition()) -- MIDDLE CLICK TO FOCUS TIMELINE WINDOW
-    hs.eventtap.keyStroke(shift_hyp, "s", 200, self.frontApp) -- MOVE PLAYHEAD TO CURSOR
-    -- return true
-  end
+  -- if util.findEqualColorInTable(colorAtPointer, self.timelineColor) ~= false then
+  --   hs.eventtap.keyStroke(nil, "escape", 200, self.frontApp) -- ESCAPE
+  --   -- self:focusPanel('timeline')
+  --   hs.eventtap.middleClick(hs.mouse.absolutePosition()) -- MIDDLE CLICK TO FOCUS TIMELINE WINDOW
+  --   hs.eventtap.keyStroke(shift_hyp, "s", 200, self.frontApp) -- MOVE PLAYHEAD TO CURSOR
+  --   -- return true
+  -- end
   return false
 end
 
 function Class:buildHotKeys()
   print('AdobePremierePro:buildHotKeys')
   self.hotkeys = {
-    ['testing'] = hs.hotkey.new({'option'}, 'e', function()
-      util.printAlert("TESTING CURRENTLY EMPTY")
-    end),
+    -- ['testing'] = hs.hotkey.new({'option'}, 'e', function()
+    --   util.printAlert("TESTING CURRENTLY EMPTY")
+    -- end),
     -- ['cut and speedup'] = hs.hotkey.new({'option'}, 'c', function()
     --   self:focusPanel('timeline')
     --   hs.eventtap.keyStroke(shift_hyp, "k", 200, self.frontApp) -- SHUTTLE STOP
@@ -259,31 +289,106 @@ function Class:buildHotKeys()
     --   hs.eventtap.keyStroke(shift_hyp, "c", 200, self.frontApp) -- RIPPLE DELETE TO LEFT
     --   self:shuttleFaster()
     -- end),
-    ['ripple to left with speedup'] = hs.hotkey.new({'option'}, 'q', function()
-      self:focusPanel('timeline')
-      hs.eventtap.keyStroke(shift_hyp, "k", 200, self.frontApp) -- SHUTTLE STOP
-      hs.eventtap.keyStroke(shift_hyp, "k", 200, self.frontApp) -- SHUTTLE STOP
-      hs.eventtap.keyStroke(shift_hyp, "q", 200, self.frontApp) -- RIPPLE DELETE TO LEFT
-      hs.eventtap.keyStroke(shift, "left", 200, self.frontApp) -- MOVE PAYHEAD _X_ FRAMES LEFT
-      hs.eventtap.keyStroke(shift, "left", 200, self.frontApp) -- MOVE PAYHEAD _X_ FRAMES LEFT
-      hs.eventtap.keyStroke(shift, "left", 200, self.frontApp) -- MOVE PAYHEAD _X_ FRAMES LEFT
-      hs.eventtap.keyStroke(shift, "left", 200, self.frontApp) -- MOVE PAYHEAD _X_ FRAMES LEFT
-      hs.eventtap.keyStroke(shift, "left", 200, self.frontApp) -- MOVE PAYHEAD _X_ FRAMES LEFT
-      hs.eventtap.keyStroke(shift, "left", 200, self.frontApp) -- MOVE PAYHEAD _X_ FRAMES LEFT
-      self:shuttleFaster()
+    -- ['ripple to left with speedup'] = hs.hotkey.new({'option'}, 'q', function()
+    --   self:focusPanel('timeline')
+    --   hs.eventtap.keyStroke(shift_hyp, "k", 200, self.frontApp) -- SHUTTLE STOP
+    --   hs.eventtap.keyStroke(shift_hyp, "k", 200, self.frontApp) -- SHUTTLE STOP
+    --   hs.eventtap.keyStroke(shift_hyp, "q", 200, self.frontApp) -- RIPPLE DELETE TO LEFT
+    --   hs.eventtap.keyStroke(shift, "left", 200, self.frontApp) -- MOVE PAYHEAD _X_ FRAMES LEFT
+    --   hs.eventtap.keyStroke(shift, "left", 200, self.frontApp) -- MOVE PAYHEAD _X_ FRAMES LEFT
+    --   hs.eventtap.keyStroke(shift, "left", 200, self.frontApp) -- MOVE PAYHEAD _X_ FRAMES LEFT
+    --   hs.eventtap.keyStroke(shift, "left", 200, self.frontApp) -- MOVE PAYHEAD _X_ FRAMES LEFT
+    --   hs.eventtap.keyStroke(shift, "left", 200, self.frontApp) -- MOVE PAYHEAD _X_ FRAMES LEFT
+    --   hs.eventtap.keyStroke(shift, "left", 200, self.frontApp) -- MOVE PAYHEAD _X_ FRAMES LEFT
+    --   self:shuttleFaster()
+    -- end),
+    -- ['ripple to right with speedup'] = hs.hotkey.new({'option'}, 'w', function()
+    --   self:focusPanel('timeline')
+    --   hs.eventtap.keyStroke(shift_hyp, "k", 200, self.frontApp) -- SHUTTLE STOP
+    --   hs.eventtap.keyStroke(shift_hyp, "k", 200, self.frontApp) -- SHUTTLE STOP
+    --   hs.eventtap.keyStroke(shift_hyp, "w", 200, self.frontApp) -- RIPPLE DELETE TO RIGHT
+    --   hs.eventtap.keyStroke(shift, "left", 200, self.frontApp) -- MOVE PAYHEAD _X_ FRAMES LEFT
+    --   hs.eventtap.keyStroke(shift, "left", 200, self.frontApp) -- MOVE PAYHEAD _X_ FRAMES LEFT
+    --   hs.eventtap.keyStroke(shift, "left", 200, self.frontApp) -- MOVE PAYHEAD _X_ FRAMES LEFT
+    --   hs.eventtap.keyStroke(shift, "left", 200, self.frontApp) -- MOVE PAYHEAD _X_ FRAMES LEFT
+    --   hs.eventtap.keyStroke(shift, "left", 200, self.frontApp) -- MOVE PAYHEAD _X_ FRAMES LEFT
+    --   hs.eventtap.keyStroke(shift, "left", 200, self.frontApp) -- MOVE PAYHEAD _X_ FRAMES LEFT
+    --   self:shuttleFaster()
+    -- end),
+    ['toggle single key shortcuts'] = hs.hotkey.new(shift, 'x', function()
+      util.printAlert("Toggle SingleKeyShortcuts")
+      util.toggleSingleKeyShortcuts()
     end),
-    ['ripple to right with speedup'] = hs.hotkey.new({'option'}, 'w', function()
-      self:focusPanel('timeline')
-      hs.eventtap.keyStroke(shift_hyp, "k", 200, self.frontApp) -- SHUTTLE STOP
-      hs.eventtap.keyStroke(shift_hyp, "k", 200, self.frontApp) -- SHUTTLE STOP
-      hs.eventtap.keyStroke(shift_hyp, "w", 200, self.frontApp) -- RIPPLE DELETE TO RIGHT
-      hs.eventtap.keyStroke(shift, "left", 200, self.frontApp) -- MOVE PAYHEAD _X_ FRAMES LEFT
-      hs.eventtap.keyStroke(shift, "left", 200, self.frontApp) -- MOVE PAYHEAD _X_ FRAMES LEFT
-      hs.eventtap.keyStroke(shift, "left", 200, self.frontApp) -- MOVE PAYHEAD _X_ FRAMES LEFT
-      hs.eventtap.keyStroke(shift, "left", 200, self.frontApp) -- MOVE PAYHEAD _X_ FRAMES LEFT
-      hs.eventtap.keyStroke(shift, "left", 200, self.frontApp) -- MOVE PAYHEAD _X_ FRAMES LEFT
-      hs.eventtap.keyStroke(shift, "left", 200, self.frontApp) -- MOVE PAYHEAD _X_ FRAMES LEFT
-      self:shuttleFaster()
+    -- ['move to cursor and play tripple speed'] = hs.hotkey.new(shift, 'd', function()
+    --   local target = util.frontAppStartsWithBundleId(self.bundleId)
+    --   if not target then return false end
+    --   self.frontApp = target
+    --   if util.singleKeyShortcutsActive and not util.focusedElementIsTextField() then
+    --     util.printAlert("Move Playhead & Speedup")
+    --     hs.eventtap.keyStroke(nil, "escape", 200, self.frontApp) -- ESCAPE
+    --     self:focusPanel('timeline')
+    --     hs.eventtap.keyStroke(shift_hyp, "k", 200, self.frontApp) -- SHUTTLE STOP
+    --     hs.timer.doAfter(.1, function()
+    --       hs.eventtap.keyStroke(shift_hyp, "s", 200, self.frontApp) -- MOVE PLAYHEAD TO CURSOR
+    --       hs.timer.doAfter(.1, function()
+    --         self:shuttleFaster(true)
+    --       end)
+    --     end)
+    --     return true
+    --   end
+    --   return false
+    -- end),
+    ['double speed'] = hs.hotkey.new(shift_hyp, 'z', function()
+      local target = util.frontAppStartsWithBundleId(self.bundleId)
+      if not target then return false end
+      self.frontApp = target
+      if not util.focusedElementIsTextField() then
+        util.printAlert("Double Time 2x")
+        self:focusPanel('timeline')
+        self:shuttleFaster()
+        return true -- prevent default
+      end
+      return false
+    end),
+    ['Move to Playhead to Cursor'] = hs.hotkey.new(shift_hyp, 's', function()
+      -- if not util.currentElementRoleIsTextFied() then
+      -- if nil == util.currentElement() then
+      if util.singleKeyShortcutsActive and not util.focusedElementIsTextField() then
+        util.printAlert("Move Playhead")
+        hs.eventtap.keyStroke(nil, "escape", 200, self.frontApp) -- ESCAPE
+        self:focusPanel('timeline')
+        hs.eventtap.keyStroke(shift_hyp, "s", 200, self.frontApp) -- MOVE PLAYHEAD TO CURSOR
+        return true
+      end
+      return false
+    end),
+    ['Play at Cursor'] = hs.hotkey.new(shift_hyper, 'd', function()
+      if util.singleKeyShortcutsActive and not util.focusedElementIsTextField() then
+        util.printAlert("Move Playhead & Speedup")
+        hs.eventtap.keyStroke(nil, "escape", 200, self.frontApp) -- ESCAPE
+        self:focusPanel('timeline')
+        hs.eventtap.keyStroke(shift_hyp, "k", 200, self.frontApp) -- SHUTTLE STOP
+        hs.timer.doAfter(.1, function()
+          hs.eventtap.keyStroke(shift_hyp, "s", 200, self.frontApp) -- MOVE PLAYHEAD TO CURSOR
+          hs.timer.doAfter(.1, function()
+            self:shuttleFaster()
+          end)
+        end)
+        return true
+      end
+      return false
+    end),
+    ['Set Marker & Edit'] = hs.hotkey.new(shift_hyp, 'm', function()
+      -- if not util.currentElementRoleIsTextFied() then
+      -- if nil == util.currentElement() then
+      if util.singleKeyShortcutsActive and not util.focusedElementIsTextField() then
+        util.printAlert("Add Marker")
+        self:focusPanel('timeline')
+        hs.eventtap.keyStroke(shift_hyp, "a", 200, self.frontApp) -- DESELECT ALL
+        hs.eventtap.keyStroke(shift_hyp, "m", 200, self.frontApp) -- ADD MARKER
+        return true
+      end
+      return false
     end),
   }
 end
@@ -293,7 +398,9 @@ function Class:buildSingleKeys()
   print('AdobePremierePro:buildSingleKeys')
   local keyEventsForSingleKeys = {
     ['s'] = function()
-      if not util.currentElementRoleIsTextFied() then
+      -- if not util.currentElementRoleIsTextFied() then
+      -- if nil == util.currentElement() then
+      if util.singleKeyShortcutsActive and not util.focusedElementIsTextField() then
         util.printAlert("Move Playhead")
         hs.eventtap.keyStroke(nil, "escape", 200, self.frontApp) -- ESCAPE
         self:focusPanel('timeline')
@@ -303,18 +410,25 @@ function Class:buildSingleKeys()
       return false
     end,
     ['d'] = function()
-      if not util.currentElementRoleIsTextFied() then
+      if util.singleKeyShortcutsActive and not util.focusedElementIsTextField() then
         util.printAlert("Move Playhead & Speedup")
         hs.eventtap.keyStroke(nil, "escape", 200, self.frontApp) -- ESCAPE
-        -- self:focusPanel('timeline')
-        hs.eventtap.keyStroke(shift_hyp, "s", 200, self.frontApp) -- MOVE PLAYHEAD TO CURSOR
-        self:shuttleFaster()
+        self:focusPanel('timeline')
+        hs.eventtap.keyStroke(shift_hyp, "k", 200, self.frontApp) -- SHUTTLE STOP
+        hs.timer.doAfter(.1, function()
+          hs.eventtap.keyStroke(shift_hyp, "s", 200, self.frontApp) -- MOVE PLAYHEAD TO CURSOR
+          hs.timer.doAfter(.1, function()
+            self:shuttleFaster()
+          end)
+        end)
         return true
       end
       return false
     end,
     ['m'] = function()
-      if not util.currentElementRoleIsTextFied() then
+      -- if not util.currentElementRoleIsTextFied() then
+      -- if nil == util.currentElement() then
+      if util.singleKeyShortcutsActive and not util.focusedElementIsTextField() then
         util.printAlert("Add Marker")
         self:focusPanel('timeline')
         hs.eventtap.keyStroke(shift_hyp, "a", 200, self.frontApp) -- DESELECT ALL
@@ -324,7 +438,9 @@ function Class:buildSingleKeys()
       return false
     end,
     ['z'] = function()
-      if not util.currentElementRoleIsTextFied() then
+      -- if not util.currentElementRoleIsTextFied() then
+      -- if nil == util.currentElement() then
+      if util.singleKeyShortcutsActive and not util.focusedElementIsTextField() then
         util.printAlert("Double Time 2x")
         self:focusPanel('timeline')
         self:shuttleFaster()
@@ -333,7 +449,9 @@ function Class:buildSingleKeys()
       return false -- propagate key
     end,
     ['b'] = function()
-      if not util.currentElementRoleIsTextFied() then
+      -- if not util.currentElementRoleIsTextFied() then
+      -- if nil == util.currentElement() then
+      if util.singleKeyShortcutsActive and not util.focusedElementIsTextField() then
         self:openModal()
         return true -- prevent default
       end
@@ -341,6 +459,11 @@ function Class:buildSingleKeys()
     end,
   }
   self.eventtap = hs.eventtap.new({ hs.eventtap.event.types.keyDown, hs.eventtap.event.types.leftMouseDown }, function(event)
+    local targetPremiere = util.frontAppStartsWithBundleId(self.bundleId)
+    if not targetPremiere then
+      return false
+    end
+    self.frontApp = targetPremiere
     local currentModifiers = event:getFlags()
     local keyPressed = hs.keycodes.map[event:getKeyCode()]
     if event:getType() == hs.eventtap.event.types.keyDown then
@@ -352,11 +475,12 @@ function Class:buildSingleKeys()
         return keyFunction()
       end
       return false
-    elseif event:getType() == hs.eventtap.event.types.leftMouseDown then
-      if next(currentModifiers) ~= nil then -- ignore input when modifiers are held
-        return false
-      end
-      return self:timelineMovePlayheadToMouse()
+    -- Process click and try to "move playhead to cursor on click if color matches the one in config"!
+    -- elseif event:getType() == hs.eventtap.event.types.leftMouseDown then
+    --   if next(currentModifiers) ~= nil then -- ignore input when modifiers are held
+    --     return false
+    --   end
+    --   return self:timelineMovePlayheadToMouse()
     end
   end)
 end
@@ -365,14 +489,14 @@ end
 function Class:buildModal()
   print('AdobePremierePro:buildModal')
   self.modal = spoon.RecursiveBinderModified.recursiveBind({
-    [singleKey('u', 'Unfocus Endcard')] = function()
-      self:applyPreset('Unfocus Endcard v3') end,
-    [singleKey('w', 'Warp Stabilizer')] = function()
-      self:applyPreset('Warp Stabilizer') end,
-    [singleKey('r', '200% to 220%')] = function()
-      self:applyPreset('Zoom: 200% to 220%') end,
-    [singleKey('t', '100% to 110%')] = function()
-      self:applyPreset('Zoom: 100% to 110%') end,
+    -- [singleKey('u', 'Unfocus Endcard')] = function()
+    --   self:applyPreset('Unfocus Endcard v3') end,
+    -- [singleKey('w', 'Warp Stabilizer')] = function()
+    --   self:applyPreset('Warp Stabilizer') end,
+    -- [singleKey('r', '200% to 220%')] = function()
+    --   self:applyPreset('Zoom: 200% to 220%') end,
+    -- [singleKey('t', '100% to 110%')] = function()
+    --   self:applyPreset('Zoom: 100% to 110%') end,
     [singleKey('n', 'Nest Clip')] = function()
       hs.eventtap.keyStroke(shift_hyp, "n", 200, self.frontApp) end,
     [singleKey('d', 'Delete Empty Tracks')] = function()
@@ -381,14 +505,14 @@ function Class:buildModal()
       hs.eventtap.keyStroke(shift_hyp, "o", 200, self.frontApp) end,
     [singleKey('l', 'Link Media')] = function()
       hs.eventtap.keyStroke(shift_hyp, "i", 200, self.frontApp) end,
-    [singleKey('p', 'Panels+')] = {
-      [singleKey('p', 'Projects')] = function() self:focusPanel('projects') end,
-      [singleKey('t', 'Timeline')] = function() self:focusPanel('timeline') end,
-      [singleKey('l', 'Lumetri')] = function() self:focusPanel('lumetri') end,
-      [singleKey('c', 'Effects Control')] = function() self:focusPanel('effectsControl') end,
-      [singleKey('a', 'Audio Mixer')] = function() self:focusPanel('audioMixer') end,
-      [singleKey('e', 'Effects')] = function() self:focusPanel('effects') end,
-    },
+    -- [singleKey('p', 'Panels+')] = {
+    --   [singleKey('p', 'Projects')] = function() self:focusPanel('projects') end,
+    --   [singleKey('t', 'Timeline')] = function() self:focusPanel('timeline') end,
+    --   [singleKey('l', 'Lumetri')] = function() self:focusPanel('lumetri') end,
+    --   [singleKey('c', 'Effects Control')] = function() self:focusPanel('effectsControl') end,
+    --   [singleKey('a', 'Audio Mixer')] = function() self:focusPanel('audioMixer') end,
+    --   [singleKey('e', 'Effects')] = function() self:focusPanel('effects') end,
+    -- },
     [singleKey('e', 'Export+')] = {
       [singleKey('m', 'Markers')] = function()
         self:focusPanel('timeline')
@@ -513,7 +637,7 @@ function Class:focusPanel(panel)
   return false
 end
 
-function Class:shuttleFaster()
+function Class:shuttleFaster(double)
   print('AdobePremierePro:shuttleFaster')
 
   hs.eventtap.keyStroke(shift_hyp, "k", 2000, self.frontApp) -- SHUTTLE STOP
@@ -523,6 +647,11 @@ function Class:shuttleFaster()
       hs.eventtap.keyStroke({}, "space", 2000, self.frontApp) -- SHUTTLE FORWARD 1x self.Speed
         hs.timer.doAfter(.01, function()
           hs.eventtap.keyStroke(shift_hyp, "l", 2000, self.frontApp) -- SHUTTLE FORWARD 2x self.Speed
+          if double then
+            hs.timer.doAfter(.01, function()
+              hs.eventtap.keyStroke(shift_hyp, "l", 2000, self.frontApp) -- SHUTTLE FORWARD 2x self.Speed
+            end)
+          end
         end)
     end)
   end)
