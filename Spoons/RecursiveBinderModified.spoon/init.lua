@@ -1,7 +1,8 @@
 -- MODIFICATIONS
 -- Recursive Binder take an optional function which should be executed onClose / onTerminate
 -- Add util.pairsSortedByKeys so the keys are sorted.
-local util = require('../util')
+-- Add obj.exitActive() to close an open modal and its helper from the outside (e.g. on app switch).
+local util = require('util')
 
 --- === RecursiveBinder ===
 ---
@@ -232,6 +233,24 @@ local function killHelper()
    hs.alert.closeSpecific(previousHelperID)
 end
 
+-- the modal that is currently waiting for a key (nil when none is open)
+local activeModal = nil
+
+--- RecursiveBinder.exitActive()
+--- Method
+--- Exit the currently open modal (if any) and close its helper. Does not call onClose.
+---
+--- Returns:
+---  * true if a modal was open, false otherwise
+function obj.exitActive()
+   if not activeModal then return false end
+   local modal = activeModal
+   activeModal = nil
+   modal:exit()
+   killHelper()
+   return true
+end
+
 --- RecursiveBinder.recursiveBind(keymap)
 --- Method
 --- Bind sequential keys by a nested keymap.
@@ -264,6 +283,7 @@ function obj.recursiveBind(keymap, onClose)
    local modal = hs.hotkey.modal.new()
    local keyFuncNameTable = {}
    modal:bind(obj.escapeKey[1], obj.escapeKey[2], function()
+      activeModal = nil
       modal:exit()
       killHelper()
       if onClose and type(onClose) == 'function' then onClose() end
@@ -272,6 +292,7 @@ function obj.recursiveBind(keymap, onClose)
       local func = obj.recursiveBind(map, onClose)
       -- key[1] is modifiers, i.e. {'shift'}, key[2] is key, i.e. 'f'
       modal:bind(key[1], key[2], function()
+         activeModal = nil
          modal:exit()
          killHelper()
          func()
@@ -281,6 +302,7 @@ function obj.recursiveBind(keymap, onClose)
       end
    end
    return function()
+      activeModal = modal
       modal:enter()
       killHelper()
       if obj.showBindHelper then

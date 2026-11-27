@@ -1,4 +1,4 @@
-local util = require('./util')
+local util = require('util')
 
 -- TODO: possibly improve to handle window resizing as well?
 -- Resource for window resize tracking: https://gist.github.com/tmandry/a5b1ab6d6ea012c1e8c5

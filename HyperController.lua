@@ -1,25 +1,10 @@
 -- INCREDIBLY ADVANCED HYPER
 -- https://gist.github.com/amonks/d271f618cf0c52515e0b5b71a5dcf8ca
-local INTRO = [[
-HYPER
-## install
-- install hammerspoon
-- save this file as `~/.hammerspoon/hyper.lua`
-- add `require('hyper'):new()` to `~/.hammerspoon/init.lua`
-## use
-- press capslock by itself to send escape.
-- or use it as a modifier:
-- It acts like `command+option+ctrl`. All the modifiers at once.
-- It's hard to type all the modifiers at once, so app keyboard shortcuts almost never require you to.
-- But it's still allowed in set-your-own-shortcut fields!
-- You now have an extra modifier key _and_ an extra escape key. Go nuts.
-]]
-
-local Class = require('./_ClassSingleton')()
+local Class = require('_ClassSingleton')()
 function Class:constructor()
   self.definedActionKey = 'ESCAPE'
-  self.hyperCombo = {"cmd","option","control"}
-  -- self.hyperCombo = {"cmd","option","control","shift"}
+  self.hyperCombo = require('keys').hyper
+  self.active = false -- true while the Hyper (Escape/Caps Lock) key is held
   self.hyperAlertStyle = {
     radius = 0,
     atScreenEdge = 2,
@@ -149,11 +134,11 @@ function Class:buildHyper()
     end
   end
 
-  hyperDown = hyper(true)
-  hyperUp = hyper(false)
+  local hyperDown = hyper(true)
+  local hyperUp = hyper(false)
 
   -- actually bind a key
-  hyperBind = function(key)
+  local hyperBind = function(key)
     self.modal:bind('', key, nil, hyperDown(key), hyperUp(key), nil)
   end
 
@@ -182,7 +167,6 @@ function Class:buildEventtap()
       and self.previousKey == self.definedActionKey:lower() then
         -- print('up')
         self.previousKey = nil
-        self.definedActionKey:lower()
         return self:releasedActionKey()
     elseif keyPressed == self.definedActionKey:lower() then
       -- ignore following HyperKey Presses
@@ -195,7 +179,6 @@ function Class:buildEventtap()
   self.eventtap:start()
 end
 
--- Enter Hyper Mode when F18 (Hyper/Capslock) is pressed
 -- Glyphs for the alert, in Apple's modifier order (⌃⌥⇧⌘)
 local modifierGlyphs = { {"control", "⌃"}, {"option", "⌥"}, {"shift", "⇧"}, {"cmd", "⌘"} }
 local keyGlyphs = {
@@ -225,7 +208,9 @@ function Class:showCombo(key)
   self.comboAlert = hs.alert(self:comboGlyphs() .. " " .. label, self.hyperAlertStyle, 1)
 end
 
+-- Enter Hyper Mode when Escape (Caps Lock) is pressed
 function Class:pressedActionKey()
+  self.active = true
   self.triggered = false
   self.modal:enter()
   self.alert = hs.alert('HYPER ' .. self:comboGlyphs(), self.hyperAlertStyle, 'indefinite')
@@ -234,9 +219,10 @@ function Class:pressedActionKey()
   return true
 end
 
--- Leave Hyper Mode when F18 (Hyper/Capslock) is pressed,
+-- Leave Hyper Mode when Escape (Caps Lock) is released,
 --   send ESCAPE if no other keys are pressed.
 function Class:releasedActionKey()
+  self.active = false
   self.modal:exit()
   hs.alert.closeSpecific(self.alert)
   if not self.triggered then

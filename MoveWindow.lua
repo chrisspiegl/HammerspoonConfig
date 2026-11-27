@@ -1,4 +1,4 @@
-local util = require('./util')
+local util = require('util')
 
 -- Set global duration of all window moving transitions
 hs.window.animationDuration = 0

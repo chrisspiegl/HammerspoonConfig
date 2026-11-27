@@ -32,28 +32,24 @@ hs.loadSpoon("RecursiveBinderModified")
 -- Custom Configuration from here down…
 
 
-local util = require("./util")
-local HyperController = require("./HyperController"):new()
+local HyperController = require("HyperController"):new()
 
-local AppWatcher = require('./AppWatcher'):new()
+local AppWatcher = require('AppWatcher'):new()
 AppWatcher:enable()
 
-local premiere = require('./AdobePremierePro'):new()
+local premiere = require('AdobePremierePro'):new()
 premiere:start(AppWatcher)
 
 -- DaVinci Resolve, imagefind, Audition, Lightroom, iA Writer, focus and axbrowse are parked in graveyard/ (not loaded).
 
 -- Moving windows (more layouts are in graveyard/init-2026-11-27.lua)
-local moveWindow = require("./moveWindow")
+local moveWindow = require("MoveWindow")
 hs.hotkey.bind({ 'control', 'option' }, "down", function() moveWindow.toNextScreen() end) -- Move to Next Screen
-hs.hotkey.bind({ 'control', 'option' }, "v", function() moveWindow.centerPortrait() end) -- Move to Next Screen
+hs.hotkey.bind({ 'control', 'option' }, "v", function() moveWindow.centerPortrait() end) -- Center window in 9:16 portrait
 
--- Color presets
-col = hs.drawing.color.x11
-
--- Swallow Option+Space and Shift+Option+Space (they type a non-breaking space)
-hs.hotkey.bind({'alt'}, 'space', function() return nil end) -- an empty space is more reliably typed via keys since it is text we want to enter.
-hs.hotkey.bind({'alt', 'shift'}, 'space', function() return nil end) -- an empty space is more reliably typed via keys since it is text we want to enter.
+-- Swallow Option+Space and Shift+Option+Space so no non-breaking space is typed.
+hs.hotkey.bind({'alt'}, 'space', function() return nil end)
+hs.hotkey.bind({'alt', 'shift'}, 'space', function() return nil end)
 
 -- Everything else that was commented out here (Spoons, modal launcher, caps toggle,
 -- ping, color picker, focus monitor) lives in graveyard/init-2026-11-27.lua.
