@@ -31,7 +31,6 @@ hs.loadSpoon("RecursiveBinderModified")
 
 -- Custom Configuration from here down…
 
--- Caps Lock -> F18 (HID level), re-applied on wake/unlock/USB changes. HyperController listens for F18.
 
 local util = require("./util")
 local HyperController = require("./HyperController"):new()
