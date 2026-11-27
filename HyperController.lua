@@ -15,12 +15,10 @@ HYPER
 - You now have an extra modifier key _and_ an extra escape key. Go nuts.
 ]]
 
-local keys = require('./keys')
 local Class = require('./_ClassSingleton')()
 function Class:constructor()
-  -- Caps Lock is remapped to F18 by hidmap.lua (hidutil), so the real Escape key is untouched.
-  self.definedActionKey = 'F18'
-  self.hyperCombo = keys.hyper
+  self.definedActionKey = 'ESCAPE'
+  self.hyperCombo = {"cmd","option","control"}
   -- self.hyperCombo = {"cmd","option","control","shift"}
   self.hyperAlertStyle = {
     radius = 0,
@@ -236,7 +234,7 @@ function Class:pressedActionKey()
   return true
 end
 
--- Leave Hyper Mode when F18 (Hyper/Capslock) is released,
+-- Leave Hyper Mode when F18 (Hyper/Capslock) is pressed,
 --   send ESCAPE if no other keys are pressed.
 function Class:releasedActionKey()
   self.modal:exit()
@@ -250,9 +248,10 @@ function Class:releasedActionKey()
       hs.eventtap.event.newKeyEvent({}, 'escape', true),
       hs.eventtap.event.newKeyEvent({}, 'escape', false),
     }
+    -- One could just return true (if and only if the escape key is the action key!)
+    -- However: then it does not work reliably because one of the key directions was blocked from happening. Not good!
+    -- return true
   end
-  -- Swallow the F18 key up so apps never see F18.
-  return true
 end
 
 return Class
