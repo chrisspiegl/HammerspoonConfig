@@ -142,6 +142,7 @@ function Class:buildHyper()
     return function(key)
       return function()
         self.triggered = true
+        if isdown then self:showCombo(key) end
         local event = hs.eventtap.event.newKeyEvent(self.hyperCombo, key, isdown)
         event:post()
       end
@@ -195,10 +196,39 @@ function Class:buildEventtap()
 end
 
 -- Enter Hyper Mode when F18 (Hyper/Capslock) is pressed
+-- Glyphs for the alert, in Apple's modifier order (⌃⌥⇧⌘)
+local modifierGlyphs = { {"control", "⌃"}, {"option", "⌥"}, {"shift", "⇧"}, {"cmd", "⌘"} }
+local keyGlyphs = {
+  ["return"] = "↩", tab = "⇥", space = "Space", delete = "⌫", forwarddelete = "⌦",
+  escape = "⎋", left = "←", right = "→", up = "↑", down = "↓",
+  home = "↖", ["end"] = "↘", pageup = "⇞", pagedown = "⇟", help = "Help",
+  padenter = "⌤", padclear = "⌧",
+}
+
+function Class:comboGlyphs()
+  if not self.comboPrefix then
+    local mods = {}
+    for _, m in ipairs(self.hyperCombo) do mods[m] = true end
+    local glyphs = ""
+    for _, pair in ipairs(modifierGlyphs) do
+      if mods[pair[1]] then glyphs = glyphs .. pair[2] end
+    end
+    self.comboPrefix = glyphs
+  end
+  return self.comboPrefix
+end
+
+-- Show which shortcut the Hyper press sent, e.g. "⌃⌥⌘ K"
+function Class:showCombo(key)
+  local label = keyGlyphs[key] or (key:match("^pad") and "Num " .. key:sub(4):upper()) or key:upper()
+  if self.comboAlert then hs.alert.closeSpecific(self.comboAlert, 0) end
+  self.comboAlert = hs.alert(self:comboGlyphs() .. " " .. label, self.hyperAlertStyle, 1)
+end
+
 function Class:pressedActionKey()
   self.triggered = false
   self.modal:enter()
-  self.alert = hs.alert('HYPER ACTIVE', self.hyperAlertStyle, 'indefinite')
+  self.alert = hs.alert('HYPER ' .. self:comboGlyphs(), self.hyperAlertStyle, 'indefinite')
   -- NOTE (2024-07-19): changed the `false` to `true` which means the previous event should be deleted and not propagated.
   -- This is an experiment if it affects Photoshop at all in handling this better (Firstly, a boolean, true if the event should be deleted, false if it should propagate to any other applications watching for that event. Secondly, a table of events to post.)
   return true
@@ -211,7 +241,7 @@ function Class:releasedActionKey()
   hs.alert.closeSpecific(self.alert)
   if not self.triggered then
     -- hs.eventtap.keyStroke({}, 'ESCAPE')
-    hs.alert('ESCAPE', self.hyperAlertStyle, 1)
+    hs.alert('⎋ ESCAPE', self.hyperAlertStyle, 1)
     -- NOTE (2024-07-19): changed the `false` to `true` which means the previous event should be deleted and not propagated.
     -- This is an experiment if it affects Photoshop at all in handling this better (Firstly, a boolean, true if the event should be deleted, false if it should propagate to any other applications watching for that event. Secondly, a table of events to post.)
     return true, { -- using the surrounding eventtap is more reliable to send these keys than with the `doKeystroke` or simple `eventtap.keystroke`
