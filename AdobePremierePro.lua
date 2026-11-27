@@ -36,12 +36,12 @@
 
 local util = require('./util')
 local AppWatcher = require('./AppWatcher')
-spoon.SpoonInstall:andUse("RecursiveBinderModified")
+local keys = require('./keys')
 singleKey = spoon.RecursiveBinderModified.singleKey
 
 local Class = require('./_ClassSingleton')()
 function Class:constructor()
-  print('AdobePremierePro:Constructor')
+  if DEBUG then print('AdobePremierePro:Constructor') end
   -- Watcher prefix: matches release (`com.adobe.PremierePro`) and Beta (`com.adobe.PremierePro…`).
   self.bundleId = 'com.adobe.PremierePro'
   self.watcher = nil
@@ -49,6 +49,7 @@ function Class:constructor()
   self.eventtap = nil
   self.modal = nil
   self.hotkeys = nil
+  self.menubar = nil
 
   self.timelineColor = {
     -- ['internal M1 Max - timeline above tracks'] = {
@@ -181,43 +182,72 @@ function Class:constructor()
 end
 
 function Class:start(watcher)
-  print('AdobePremierePro:start')
+  if DEBUG then print('AdobePremierePro:start') end
   self.watcher = watcher or self.watcher or nil
   self:buildAppWatcher()
   self.watcher:enable()
 end
 
 function Class:stop()
-  print('AdobePremierePro:stop')
+  if DEBUG then print('AdobePremierePro:stop') end
   self.watcher:unwatch(self.bundleId)
 end
 
 function Class:launched()
-  print('AdobePremierePro:launched')
+  if DEBUG then print('AdobePremierePro:launched') end
   -- util.printAlert('Premiere: Launched')
 end
 
 function Class:terminated()
-  print('AdobePremierePro:terminated')
+  if DEBUG then print('AdobePremierePro:terminated') end
   -- util.printAlert('Premiere: Terminated')
 end
 
 function Class:activated()
-  print('AdobePremierePro:activated')
+  if DEBUG then print('AdobePremierePro:activated') end
   self.frontApp = util.frontAppStartsWithBundleId(self.bundleId)
   self:enableSingleKeys()
   self:enableHotKeys()
+  self:createMenubar()
 end
 
 function Class:deactivated()
-  print('AdobePremierePro:deactivated')
+  if DEBUG then print('AdobePremierePro:deactivated') end
   self.frontApp = nil
   self:disableSingleKeys()
   self:disableHotKeys()
+  self:deleteMenubar()
+end
+
+-- Menu bar indicator for the single-key state; only exists while Premiere is active. Click toggles.
+function Class:updateMenubar()
+  if not self.menubar then return end
+  self.menubar:setTitle(util.singleKeyShortcutsActive and 'PR ●' or 'PR ○')
+  self.menubar:setTooltip(util.singleKeyShortcutsActive and 'Premiere single keys: ON (⌃⌥⌘X toggles)' or 'Premiere single keys: OFF (⌃⌥⌘X toggles)')
+end
+
+function Class:createMenubar()
+  if self.menubar then return end
+  self.menubar = hs.menubar.new()
+  if not self.menubar then return end
+  self.menubar:setClickCallback(function() self:toggleSingleKeyShortcuts() end)
+  self:updateMenubar()
+end
+
+function Class:deleteMenubar()
+  if self.menubar then
+    self.menubar:delete()
+    self.menubar = nil
+  end
+end
+
+function Class:toggleSingleKeyShortcuts()
+  util.toggleSingleKeyShortcuts()
+  self:updateMenubar()
 end
 
 function Class:buildAppWatcher()
-  print('AdobePremierePro:buildAppWatcher')
+  if DEBUG then print('AdobePremierePro:buildAppWatcher') end
   if (not self.watcher) then
     self.watcher = AppWatcher:new()
   end
@@ -232,26 +262,26 @@ function Class:buildAppWatcher()
 end
 
 function Class:enableHotKeys()
-  print('AdobePremierePro:enableHotKeys')
+  if DEBUG then print('AdobePremierePro:enableHotKeys') end
   for key, hotkey in pairs(self.hotkeys) do
     hotkey:enable()
   end
 end
 
 function Class:disableHotKeys()
-  print('AdobePremierePro:disableHotKeys')
+  if DEBUG then print('AdobePremierePro:disableHotKeys') end
   for key, hotkey in pairs(self.hotkeys) do
     hotkey:disable()
   end
 end
 
 function Class:enableSingleKeys()
-  print('AdobePremierePro:enableSingleKeys')
+  if DEBUG then print('AdobePremierePro:enableSingleKeys') end
   self.eventtap:start() -- enable normal key tracking (when premiere is in focus)
 end
 
 function Class:disableSingleKeys()
-  print('AdobePremierePro:disableSingleKeys')
+  if DEBUG then print('AdobePremierePro:disableSingleKeys') end
   self.eventtap:stop() -- disable normal key tracking (upon premiere losing focus)
 end
 
@@ -259,7 +289,7 @@ end
 -- Must configur the `s` key to be the "Move Playhead to Mouse Pointer" shortcut
 -- Colors are calibrated.
 function Class:timelineMovePlayheadToMouse()
-  print('AdobePremierePro:timelineMovePlayheadToMouse')
+  if DEBUG then print('AdobePremierePro:timelineMovePlayheadToMouse') end
   local colorAtPointer = util.getColorAtMousePointer()
   if (not colorAtPointer) then
     return false
@@ -270,30 +300,30 @@ function Class:timelineMovePlayheadToMouse()
   --   hs.eventtap.keyStroke(nil, "escape", 200, self.frontApp) -- ESCAPE
   --   -- self:focusPanel('timeline')
   --   hs.eventtap.middleClick(hs.mouse.absolutePosition()) -- MIDDLE CLICK TO FOCUS TIMELINE WINDOW
-  --   hs.eventtap.keyStroke(shift_hyp, "s", 200, self.frontApp) -- MOVE PLAYHEAD TO CURSOR
+  --   hs.eventtap.keyStroke(keys.shift_hyp, "s", 200, self.frontApp) -- MOVE PLAYHEAD TO CURSOR
   --   -- return true
   -- end
   return false
 end
 
 function Class:buildHotKeys()
-  print('AdobePremierePro:buildHotKeys')
+  if DEBUG then print('AdobePremierePro:buildHotKeys') end
   self.hotkeys = {
     -- ['testing'] = hs.hotkey.new({'option'}, 'e', function()
     --   util.printAlert("TESTING CURRENTLY EMPTY")
     -- end),
     -- ['cut and speedup'] = hs.hotkey.new({'option'}, 'c', function()
     --   self:focusPanel('timeline')
-    --   hs.eventtap.keyStroke(shift_hyp, "k", 200, self.frontApp) -- SHUTTLE STOP
-    --   hs.eventtap.keyStroke(shift_hyp, "k", 200, self.frontApp) -- SHUTTLE STOP
-    --   hs.eventtap.keyStroke(shift_hyp, "c", 200, self.frontApp) -- RIPPLE DELETE TO LEFT
+    --   hs.eventtap.keyStroke(keys.shift_hyp, "k", 200, self.frontApp) -- SHUTTLE STOP
+    --   hs.eventtap.keyStroke(keys.shift_hyp, "k", 200, self.frontApp) -- SHUTTLE STOP
+    --   hs.eventtap.keyStroke(keys.shift_hyp, "c", 200, self.frontApp) -- RIPPLE DELETE TO LEFT
     --   self:shuttleFaster()
     -- end),
     -- ['ripple to left with speedup'] = hs.hotkey.new({'option'}, 'q', function()
     --   self:focusPanel('timeline')
-    --   hs.eventtap.keyStroke(shift_hyp, "k", 200, self.frontApp) -- SHUTTLE STOP
-    --   hs.eventtap.keyStroke(shift_hyp, "k", 200, self.frontApp) -- SHUTTLE STOP
-    --   hs.eventtap.keyStroke(shift_hyp, "q", 200, self.frontApp) -- RIPPLE DELETE TO LEFT
+    --   hs.eventtap.keyStroke(keys.shift_hyp, "k", 200, self.frontApp) -- SHUTTLE STOP
+    --   hs.eventtap.keyStroke(keys.shift_hyp, "k", 200, self.frontApp) -- SHUTTLE STOP
+    --   hs.eventtap.keyStroke(keys.shift_hyp, "q", 200, self.frontApp) -- RIPPLE DELETE TO LEFT
     --   hs.eventtap.keyStroke(shift, "left", 200, self.frontApp) -- MOVE PAYHEAD _X_ FRAMES LEFT
     --   hs.eventtap.keyStroke(shift, "left", 200, self.frontApp) -- MOVE PAYHEAD _X_ FRAMES LEFT
     --   hs.eventtap.keyStroke(shift, "left", 200, self.frontApp) -- MOVE PAYHEAD _X_ FRAMES LEFT
@@ -304,9 +334,9 @@ function Class:buildHotKeys()
     -- end),
     -- ['ripple to right with speedup'] = hs.hotkey.new({'option'}, 'w', function()
     --   self:focusPanel('timeline')
-    --   hs.eventtap.keyStroke(shift_hyp, "k", 200, self.frontApp) -- SHUTTLE STOP
-    --   hs.eventtap.keyStroke(shift_hyp, "k", 200, self.frontApp) -- SHUTTLE STOP
-    --   hs.eventtap.keyStroke(shift_hyp, "w", 200, self.frontApp) -- RIPPLE DELETE TO RIGHT
+    --   hs.eventtap.keyStroke(keys.shift_hyp, "k", 200, self.frontApp) -- SHUTTLE STOP
+    --   hs.eventtap.keyStroke(keys.shift_hyp, "k", 200, self.frontApp) -- SHUTTLE STOP
+    --   hs.eventtap.keyStroke(keys.shift_hyp, "w", 200, self.frontApp) -- RIPPLE DELETE TO RIGHT
     --   hs.eventtap.keyStroke(shift, "left", 200, self.frontApp) -- MOVE PAYHEAD _X_ FRAMES LEFT
     --   hs.eventtap.keyStroke(shift, "left", 200, self.frontApp) -- MOVE PAYHEAD _X_ FRAMES LEFT
     --   hs.eventtap.keyStroke(shift, "left", 200, self.frontApp) -- MOVE PAYHEAD _X_ FRAMES LEFT
@@ -315,87 +345,16 @@ function Class:buildHotKeys()
     --   hs.eventtap.keyStroke(shift, "left", 200, self.frontApp) -- MOVE PAYHEAD _X_ FRAMES LEFT
     --   self:shuttleFaster()
     -- end),
-    ['toggle single key shortcuts'] = hs.hotkey.new(shift, 'x', function()
+    ['toggle single key shortcuts'] = hs.hotkey.new(keys.hyper, 'x', function()
       util.printAlert("Toggle SingleKeyShortcuts")
-      util.toggleSingleKeyShortcuts()
-    end),
-    -- ['move to cursor and play tripple speed'] = hs.hotkey.new(shift, 'd', function()
-    --   local target = util.frontAppStartsWithBundleId(self.bundleId)
-    --   if not target then return false end
-    --   self.frontApp = target
-    --   if util.singleKeyShortcutsActive and not util.focusedElementIsTextField() then
-    --     util.printAlert("Move Playhead & Speedup")
-    --     hs.eventtap.keyStroke(nil, "escape", 200, self.frontApp) -- ESCAPE
-    --     self:focusPanel('timeline')
-    --     hs.eventtap.keyStroke(shift_hyp, "k", 200, self.frontApp) -- SHUTTLE STOP
-    --     hs.timer.doAfter(.1, function()
-    --       hs.eventtap.keyStroke(shift_hyp, "s", 200, self.frontApp) -- MOVE PLAYHEAD TO CURSOR
-    --       hs.timer.doAfter(.1, function()
-    --         self:shuttleFaster(true)
-    --       end)
-    --     end)
-    --     return true
-    --   end
-    --   return false
-    -- end),
-    ['double speed'] = hs.hotkey.new(shift_hyp, 'z', function()
-      local target = util.frontAppStartsWithBundleId(self.bundleId)
-      if not target then return false end
-      self.frontApp = target
-      if not util.focusedElementIsTextField() then
-        util.printAlert("Double Time 2x")
-        self:focusPanel('timeline')
-        self:shuttleFaster()
-        return true -- prevent default
-      end
-      return false
-    end),
-    ['Move to Playhead to Cursor'] = hs.hotkey.new(shift_hyp, 's', function()
-      -- if not util.currentElementRoleIsTextFied() then
-      -- if nil == util.currentElement() then
-      if util.singleKeyShortcutsActive and not util.focusedElementIsTextField() then
-        util.printAlert("Move Playhead")
-        hs.eventtap.keyStroke(nil, "escape", 200, self.frontApp) -- ESCAPE
-        self:focusPanel('timeline')
-        hs.eventtap.keyStroke(shift_hyp, "s", 200, self.frontApp) -- MOVE PLAYHEAD TO CURSOR
-        return true
-      end
-      return false
-    end),
-    ['Play at Cursor'] = hs.hotkey.new(shift_hyper, 'd', function()
-      if util.singleKeyShortcutsActive and not util.focusedElementIsTextField() then
-        util.printAlert("Move Playhead & Speedup")
-        hs.eventtap.keyStroke(nil, "escape", 200, self.frontApp) -- ESCAPE
-        self:focusPanel('timeline')
-        hs.eventtap.keyStroke(shift_hyp, "k", 200, self.frontApp) -- SHUTTLE STOP
-        hs.timer.doAfter(.1, function()
-          hs.eventtap.keyStroke(shift_hyp, "s", 200, self.frontApp) -- MOVE PLAYHEAD TO CURSOR
-          hs.timer.doAfter(.1, function()
-            self:shuttleFaster()
-          end)
-        end)
-        return true
-      end
-      return false
-    end),
-    ['Set Marker & Edit'] = hs.hotkey.new(shift_hyp, 'm', function()
-      -- if not util.currentElementRoleIsTextFied() then
-      -- if nil == util.currentElement() then
-      if util.singleKeyShortcutsActive and not util.focusedElementIsTextField() then
-        util.printAlert("Add Marker")
-        self:focusPanel('timeline')
-        hs.eventtap.keyStroke(shift_hyp, "a", 200, self.frontApp) -- DESELECT ALL
-        hs.eventtap.keyStroke(shift_hyp, "m", 200, self.frontApp) -- ADD MARKER
-        return true
-      end
-      return false
+      self:toggleSingleKeyShortcuts()
     end),
   }
 end
 
--- Build Eventtapp to listen for Single Keys & Mouse Events
+-- Build Eventtap to listen for Single Keys
 function Class:buildSingleKeys()
-  print('AdobePremierePro:buildSingleKeys')
+  if DEBUG then print('AdobePremierePro:buildSingleKeys') end
   local keyEventsForSingleKeys = {
     ['s'] = function()
       -- if not util.currentElementRoleIsTextFied() then
@@ -404,7 +363,7 @@ function Class:buildSingleKeys()
         util.printAlert("Move Playhead")
         hs.eventtap.keyStroke(nil, "escape", 200, self.frontApp) -- ESCAPE
         self:focusPanel('timeline')
-        hs.eventtap.keyStroke(shift_hyp, "s", 200, self.frontApp) -- MOVE PLAYHEAD TO CURSOR
+        hs.eventtap.keyStroke(keys.shift_hyp, "s", 200, self.frontApp) -- MOVE PLAYHEAD TO CURSOR
         return true
       end
       return false
@@ -414,9 +373,9 @@ function Class:buildSingleKeys()
         util.printAlert("Move Playhead & Speedup")
         hs.eventtap.keyStroke(nil, "escape", 200, self.frontApp) -- ESCAPE
         self:focusPanel('timeline')
-        hs.eventtap.keyStroke(shift_hyp, "k", 200, self.frontApp) -- SHUTTLE STOP
+        hs.eventtap.keyStroke(keys.shift_hyp, "k", 200, self.frontApp) -- SHUTTLE STOP
         hs.timer.doAfter(.1, function()
-          hs.eventtap.keyStroke(shift_hyp, "s", 200, self.frontApp) -- MOVE PLAYHEAD TO CURSOR
+          hs.eventtap.keyStroke(keys.shift_hyp, "s", 200, self.frontApp) -- MOVE PLAYHEAD TO CURSOR
           hs.timer.doAfter(.1, function()
             self:shuttleFaster()
           end)
@@ -431,8 +390,8 @@ function Class:buildSingleKeys()
       if util.singleKeyShortcutsActive and not util.focusedElementIsTextField() then
         util.printAlert("Add Marker")
         self:focusPanel('timeline')
-        hs.eventtap.keyStroke(shift_hyp, "a", 200, self.frontApp) -- DESELECT ALL
-        hs.eventtap.keyStroke(shift_hyp, "m", 200, self.frontApp) -- ADD MARKER
+        hs.eventtap.keyStroke(keys.shift_hyp, "a", 200, self.frontApp) -- DESELECT ALL
+        hs.eventtap.keyStroke(keys.shift_hyp, "m", 200, self.frontApp) -- ADD MARKER
         return true
       end
       return false
@@ -458,53 +417,38 @@ function Class:buildSingleKeys()
       return false -- propagate key
     end,
   }
-  self.eventtap = hs.eventtap.new({ hs.eventtap.event.types.keyDown, hs.eventtap.event.types.leftMouseDown }, function(event)
+  self.eventtap = hs.eventtap.new({ hs.eventtap.event.types.keyDown }, function(event)
+    if next(event:getFlags()) ~= nil then -- ignore input when modifiers are held
+      return false
+    end
+    local keyFunction = keyEventsForSingleKeys[hs.keycodes.map[event:getKeyCode()]]
+    if not keyFunction then
+      return false
+    end
     local targetPremiere = util.frontAppStartsWithBundleId(self.bundleId)
     if not targetPremiere then
       return false
     end
     self.frontApp = targetPremiere
-    local currentModifiers = event:getFlags()
-    local keyPressed = hs.keycodes.map[event:getKeyCode()]
-    if event:getType() == hs.eventtap.event.types.keyDown then
-      if next(currentModifiers) ~= nil then -- ignore input when modifiers are held
-        return false
-      end
-      local keyFunction = keyEventsForSingleKeys[keyPressed]
-      if keyFunction then
-        return keyFunction()
-      end
+    if util.focusedElementIsTextField() then -- let typing in search fields through
       return false
-    -- Process click and try to "move playhead to cursor on click if color matches the one in config"!
-    -- elseif event:getType() == hs.eventtap.event.types.leftMouseDown then
-    --   if next(currentModifiers) ~= nil then -- ignore input when modifiers are held
-    --     return false
-    --   end
-    --   return self:timelineMovePlayheadToMouse()
     end
+    return keyFunction()
   end)
 end
 
 
 function Class:buildModal()
-  print('AdobePremierePro:buildModal')
+  if DEBUG then print('AdobePremierePro:buildModal') end
   self.modal = spoon.RecursiveBinderModified.recursiveBind({
-    -- [singleKey('u', 'Unfocus Endcard')] = function()
-    --   self:applyPreset('Unfocus Endcard v3') end,
-    -- [singleKey('w', 'Warp Stabilizer')] = function()
-    --   self:applyPreset('Warp Stabilizer') end,
-    -- [singleKey('r', '200% to 220%')] = function()
-    --   self:applyPreset('Zoom: 200% to 220%') end,
-    -- [singleKey('t', '100% to 110%')] = function()
-    --   self:applyPreset('Zoom: 100% to 110%') end,
     [singleKey('n', 'Nest Clip')] = function()
-      hs.eventtap.keyStroke(shift_hyp, "n", 200, self.frontApp) end,
+      hs.eventtap.keyStroke(keys.shift_hyp, "n", 200, self.frontApp) end,
     [singleKey('d', 'Delete Empty Tracks')] = function()
-      hs.eventtap.keyStroke(shift_hyp, "d", 200, self.frontApp) end,
+      hs.eventtap.keyStroke(keys.shift_hyp, "d", 200, self.frontApp) end,
     [singleKey('o', 'Make Offline')] = function()
-      hs.eventtap.keyStroke(shift_hyp, "o", 200, self.frontApp) end,
+      hs.eventtap.keyStroke(keys.shift_hyp, "o", 200, self.frontApp) end,
     [singleKey('l', 'Link Media')] = function()
-      hs.eventtap.keyStroke(shift_hyp, "i", 200, self.frontApp) end,
+      hs.eventtap.keyStroke(keys.shift_hyp, "i", 200, self.frontApp) end,
     -- [singleKey('p', 'Panels+')] = {
     --   [singleKey('p', 'Projects')] = function() self:focusPanel('projects') end,
     --   [singleKey('t', 'Timeline')] = function() self:focusPanel('timeline') end,
@@ -516,17 +460,17 @@ function Class:buildModal()
     [singleKey('e', 'Export+')] = {
       [singleKey('m', 'Markers')] = function()
         self:focusPanel('timeline')
-        hs.eventtap.keyStroke(shift_hyp, "k", 200, self.frontApp) -- SHUTTLE STOP
-        hs.eventtap.keyStroke(shift_hyp, "k", 200, self.frontApp) -- SHUTTLE STOP
-        hs.eventtap.keyStroke(shift_hyp, "a", 200, self.frontApp) -- DESELECT ALL
-        hs.eventtap.keyStroke(shift_hyp, "h", 200, self.frontApp) -- EXPORT MARKERS
+        hs.eventtap.keyStroke(keys.shift_hyp, "k", 200, self.frontApp) -- SHUTTLE STOP
+        hs.eventtap.keyStroke(keys.shift_hyp, "k", 200, self.frontApp) -- SHUTTLE STOP
+        hs.eventtap.keyStroke(keys.shift_hyp, "a", 200, self.frontApp) -- DESELECT ALL
+        hs.eventtap.keyStroke(keys.shift_hyp, "h", 200, self.frontApp) -- EXPORT MARKERS
       end,
       [singleKey('e', 'Media')] = function()
         self:focusPanel('timeline')
-        hs.eventtap.keyStroke(shift_hyp, "k", 200, self.frontApp) -- SHUTTLE STOP
-        hs.eventtap.keyStroke(shift_hyp, "k", 200, self.frontApp) -- SHUTTLE STOP
-        hs.eventtap.keyStroke(shift_hyp, "a", 200, self.frontApp) -- DESELECT ALL
-        hs.eventtap.keyStroke(shift_hyp, "g", 200, self.frontApp) -- EXPORT MEDIA
+        hs.eventtap.keyStroke(keys.shift_hyp, "k", 200, self.frontApp) -- SHUTTLE STOP
+        hs.eventtap.keyStroke(keys.shift_hyp, "k", 200, self.frontApp) -- SHUTTLE STOP
+        hs.eventtap.keyStroke(keys.shift_hyp, "a", 200, self.frontApp) -- DESELECT ALL
+        hs.eventtap.keyStroke(keys.shift_hyp, "g", 200, self.frontApp) -- EXPORT MEDIA
         self:enableSingleKeys()
       end,
     },
@@ -534,98 +478,42 @@ function Class:buildModal()
 end
 
 function Class:openModal()
-  print('AdobePremierePro:openModal')
+  if DEBUG then print('AdobePremierePro:openModal') end
   self:disableSingleKeys()
   return self.modal()
 end
 
 function Class:closeModal()
-  print('AdobePremierePro:closeModal')
+  if DEBUG then print('AdobePremierePro:closeModal') end
   self:enableSingleKeys()
-end
-
--- Premiere Pro Apply Preset by Name
--- Mouse must hover over clip in timeline.
--- Clip can be selected but does not have to.
--- Applying the preset to a group of clips, all clips have to be selected and the mouse must hover at least one of the clips that should get the preset applied.
-function Class:applyPreset(presetName)
-  print('AdobePremierePro:applyPreset')
-  if not presetName then
-    util.printAlert("Premiere:applyPreset: Must provide a Preset Name!")
-    return
-  end
-
-  local timerStartFunction = util.timerStart()
-  local mouseBefore = hs.mouse.absolutePosition()
-  hs.eventtap.middleClick(mouseBefore) -- MIDDLE CLICK TO FOCUS TIMELINE WINDOW
-  hs.eventtap.keyStroke(shift_hyp, "k", 200, self.frontApp) -- SHUTTLE self.STOP
-  hs.eventtap.keyStroke(shift_hyp, "k", 200, self.frontApp) -- SHUTTLE self.STOP
-  self:focusPanel('effects') -- Auto Switch to Effects Panel
-  hs.eventtap.keyStroke(shift_hyp, "b", 15, self.frontApp) -- SELECT FIND self.BOX
-
-  -- SOURCE FOR WORKING WITH AXUI ELEMENTS: https://balatero.com/writings/hammerspoon/retrieving-input-field-values-and-cursor-position-with-hammerspoon/
-  local currentElement = nil
-  local hadToWait = 0
-  local timerWaitingForFocus = util.timerStart()
-
-  hs.timer.doAfter(.1, function()
-    -- TODO: can be improved with hs.timer.doUntil / doWhile? Something like that…
-    -- TODO: but it still needs a timer limit or something similar so that it does not keep on going invinitely.
-    currentElement = util.currentElementRoleIsTextFied()
-    if not currentElement then
-      util.printAlert('FOCUS ON PRESET SEARCH NOT FOUND')
-      return
-    end
-
-    hs.eventtap.keyStroke({'cmd'}, "a", 20) -- SELECT ALL
-    hs.eventtap.keyStroke({'shift'}, "delete", 20) -- SELECT FIND BOX
-    hs.eventtap.keyStrokes(presetName) -- TYPE EFFECT NAME
-
-    hs.timer.doAfter(.1, function()
-      if not util.currentElementValue(currentElement) == presetName then
-        util.printAlert('Could not fill Preset Search with "' .. presetName .. '"')
-      end
-      local positionPresetTextElement = util.currentElementPosition(currentElement) -- Get Screen Position of Selected Element
-      -- local scalingFactor = hs.screen.mainScreen():currentMode().scale -- Get Activve Monitor Scaling Factor
-      -- util.printAlert(scalingFactor)
-      local offsetPresetTextElementToIcon = {x= 17, y= 55} -- Devide Offset by Screen Scaling Factor
-      local positionPresetIcon = {x= positionPresetTextElement.x + offsetPresetTextElementToIcon.x, y= positionPresetTextElement.y + offsetPresetTextElementToIcon.y} -- Calculate Position of Preset Icon
-      hs.eventtap.event.newMouseEvent(hs.eventtap.event.types.leftMouseDown, positionPresetIcon):post() -- START DRAGING THE PRESET
-      hs.eventtap.event.newMouseEvent(hs.eventtap.event.types.leftMouseUp, mouseBefore):post() -- DROP THE PRESET ONTO SAVED MOUSE POSITION
-      self:focusPanel('effectsControl') -- Auto Switch to Effects Panel
-      self:focusPanel('timeline') -- Auto Switch to Effects Panel
-      hs.eventtap.keyStroke(nil, "v", 200) -- RETURN TO MAIN EDITING MODE
-      util.printAlert('Applied Preset {'.. util.timerStop(timerStartFunction) .. 'ms}')
-    end)
-  end)
 end
 
 -- Focus Premiere Panel
 -- This needs to always start from one common place (Effects Panel)
 function Class:focusPanel(panel)
-  print('AdobePremierePro:focusPanel')
+  if DEBUG then print('AdobePremierePro:focusPanel') end
   panel = panel or 'program'
   local panelSwitches = {
     ['projects'] = function()
-      hs.eventtap.keyStroke(shift_hyp, "1", 200, self.frontApp)
+      hs.eventtap.keyStroke(keys.shift_hyp, "1", 200, self.frontApp)
     end,
     ['program'] = function()
-      hs.eventtap.keyStroke(shift_hyp, "2", 200, self.frontApp)
+      hs.eventtap.keyStroke(keys.shift_hyp, "2", 200, self.frontApp)
     end,
     ['timeline'] = function()
-      hs.eventtap.keyStroke(shift_hyp, "3", 200, self.frontApp)
+      hs.eventtap.keyStroke(keys.shift_hyp, "3", 200, self.frontApp)
     end,
     ['lumetri'] = function()
-      hs.eventtap.keyStroke(shift_hyp, "4", 200, self.frontApp)
+      hs.eventtap.keyStroke(keys.shift_hyp, "4", 200, self.frontApp)
     end,
     ['effectsControl'] = function()
-      hs.eventtap.keyStroke(shift_hyp, "5", 200, self.frontApp)
+      hs.eventtap.keyStroke(keys.shift_hyp, "5", 200, self.frontApp)
     end,
     ['audioMixer'] = function()
-      hs.eventtap.keyStroke(shift_hyp, "6", 200, self.frontApp)
+      hs.eventtap.keyStroke(keys.shift_hyp, "6", 200, self.frontApp)
     end,
     ['effects'] = function()
-      hs.eventtap.keyStroke(shift_hyp, "7", 200, self.frontApp)
+      hs.eventtap.keyStroke(keys.shift_hyp, "7", 200, self.frontApp)
     end,
   }
   panelSwitches['effects']()
@@ -638,29 +526,29 @@ function Class:focusPanel(panel)
 end
 
 function Class:shuttleFaster(double)
-  print('AdobePremierePro:shuttleFaster')
+  if DEBUG then print('AdobePremierePro:shuttleFaster') end
 
-  hs.eventtap.keyStroke(shift_hyp, "k", 2000, self.frontApp) -- SHUTTLE STOP
+  hs.eventtap.keyStroke(keys.shift_hyp, "k", 2000, self.frontApp) -- SHUTTLE STOP
   hs.timer.doAfter(.1, function()
-    hs.eventtap.keyStroke(shift_hyp, "k", 2000, self.frontApp) -- SHUTTLE STOP
+    hs.eventtap.keyStroke(keys.shift_hyp, "k", 2000, self.frontApp) -- SHUTTLE STOP
     hs.timer.doAfter(.01, function()
       hs.eventtap.keyStroke({}, "space", 2000, self.frontApp) -- SHUTTLE FORWARD 1x self.Speed
         hs.timer.doAfter(.01, function()
-          hs.eventtap.keyStroke(shift_hyp, "l", 2000, self.frontApp) -- SHUTTLE FORWARD 2x self.Speed
+          hs.eventtap.keyStroke(keys.shift_hyp, "l", 2000, self.frontApp) -- SHUTTLE FORWARD 2x self.Speed
           if double then
             hs.timer.doAfter(.01, function()
-              hs.eventtap.keyStroke(shift_hyp, "l", 2000, self.frontApp) -- SHUTTLE FORWARD 2x self.Speed
+              hs.eventtap.keyStroke(keys.shift_hyp, "l", 2000, self.frontApp) -- SHUTTLE FORWARD 2x self.Speed
             end)
           end
         end)
     end)
   end)
 
-  -- hs.eventtap.keyStroke(shift_hyp, "k", 200, self.frontApp) -- SHUTTLE STOP
-  -- hs.eventtap.keyStroke(shift_hyp, "k", 200, self.frontApp) -- SHUTTLE STOP
-  -- -- hs.eventtap.keyStroke(shift_hyp, "l", 200, self.frontApp) -- SHUTTLE FORWARD 1x self.Speed
+  -- hs.eventtap.keyStroke(keys.shift_hyp, "k", 200, self.frontApp) -- SHUTTLE STOP
+  -- hs.eventtap.keyStroke(keys.shift_hyp, "k", 200, self.frontApp) -- SHUTTLE STOP
+  -- -- hs.eventtap.keyStroke(keys.shift_hyp, "l", 200, self.frontApp) -- SHUTTLE FORWARD 1x self.Speed
   -- hs.eventtap.keyStroke({}, "space", 200, self.frontApp) -- SHUTTLE FORWARD 1x self.Speed
-  -- hs.eventtap.keyStroke(shift_hyp, "l", 200, self.frontApp) -- SHUTTLE FORWARD 2x self.Speed
+  -- hs.eventtap.keyStroke(keys.shift_hyp, "l", 200, self.frontApp) -- SHUTTLE FORWARD 2x self.Speed
 end
 
 return Class

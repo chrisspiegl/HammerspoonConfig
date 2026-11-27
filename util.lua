@@ -36,19 +36,6 @@ function util.printAlert(text)
   })
 end
 
--- Debug Timer
--- START TIMER (aka return the current absolute time)
-function util.timerStart()
-  return hs.timer.absoluteTime()
-end
--- STOP TIMER by giving it the start time and you'll get the difference in milliseconds returned
-function util.timerStop(timer)
-  local endTime = hs.timer.absoluteTime()
-  local diffNs = endTime - timer
-  local diffMs = diffNs / 1000000
-  return diffMs
-end
-
 util.singleKeyShortcutsAlertStyle = {
   radius = 0,
   atScreenEdge = 2,
@@ -187,19 +174,6 @@ end
 
 -- Get the curreent UI Element Role
 -- False if no role found or no element has focus.
-function util.currentElementValue(currentElement)
-  currentElement = currentElement or util.currentElement()
-  if currentElement then
-    local AXValue = currentElement:attributeValue("AXValue")
-    if AXValue then
-      return AXValue
-    end
-  end
-  return false
-end
-
--- Get the curreent UI Element Role
--- False if no role found or no element has focus.
 function util.currentElementRole(currentElement)
   currentElement = currentElement or util.currentElement()
   if currentElement then
@@ -209,28 +183,6 @@ function util.currentElementRole(currentElement)
     end
   end
   return false
-end
-
--- Check if the current element role is text field.
--- Returns `false` if no element is focused or other error.
--- Returns `Focused UI Element` if it is a text field.
-function util.currentElementRoleIsTextFied(currentElement)
-  currentElement = currentElement or util.currentElement()
-  print('ELEMENT:')
-  print(currentElement)
-  if currentElement then
-    local AXRole = currentElement:attributeValue("AXRole")
-    if AXRole == 'AXTextField' then
-      return currentElement
-    end
-  end
-  return false
-end
-
--- Get current focused element position
-function util.currentElementPosition(currentElement)
-  currentElement = currentElement or util.currentElement()
-  return currentElement:attributeValue("AXPosition")
 end
 
 -- Get Color At Mouse Pointer

@@ -5,7 +5,7 @@ local util = require('./util')
 
 local Class = require('_ClassSingleton')()
 function Class:constructor()
-  print('AppWatcher:constructor')
+  if DEBUG then print('AppWatcher:constructor') end
   self.apps = {}
   self.enabled = false
   self.watcher = nil
@@ -22,7 +22,7 @@ function Class:constructor()
 end
 
 function Class:watch(appBundleId, functions, options)
-  print('AppWatcher:watch: '..appBundleId)
+  if DEBUG then print('AppWatcher:watch: '..appBundleId) end
   self.apps[appBundleId] = functions
   if (options and type(options) == 'table' and next(options) ~= nil) then
     if options.checkFirst then self:checkInitialState(appBundleId) end
@@ -30,19 +30,19 @@ function Class:watch(appBundleId, functions, options)
 end
 
 function Class:unwatch(appBundleId)
-  print('AppWatcher:unwatch: ' .. appBundleId)
+  if DEBUG then print('AppWatcher:unwatch: ' .. appBundleId) end
   self.apps[appBundleId] = nil
 end
 
 function Class:watched()
-  print('AppWatcher:watched')
+  if DEBUG then print('AppWatcher:watched') end
   for key, value in pairs(self.apps) do
-    print('\t' .. key)
+    if DEBUG then print('\t' .. key) end
   end
 end
 
 function Class:enable()
-  print('AppWatcher:enable')
+  if DEBUG then print('AppWatcher:enable') end
   if self.enabled then return end
   if not self.watcher then self:buildEventtap() end
   self.enabled = true
@@ -51,7 +51,7 @@ function Class:enable()
 end
 
 function Class:disable()
-  print('AppWatcher:disable')
+  if DEBUG then print('AppWatcher:disable') end
   if not self.enabled then return end
   self.enabled = false
   self.watcher:stop()
@@ -82,11 +82,11 @@ function Class:checkInitialState(appBundleId)
 end
 
 function Class:buildEventtap()
-  print('AppWatcher:buildEventtap')
+  if DEBUG then print('AppWatcher:buildEventtap') end
   self.watcher = hs.application.watcher.new(function(appName, eventType, appObject)
     local appObjectBundleId = appObject and appObject:bundleID()
     if appObjectBundleId == nil then return end
-    print("SWITCHING APP: " .. appObjectBundleId .. " - " .. eventType .. " - " .. self.lookupAppWatchEvent[eventType])
+    if DEBUG then print("SWITCHING APP: " .. appObjectBundleId .. " - " .. eventType .. " - " .. self.lookupAppWatchEvent[eventType]) end
     for appBundleId, appEventFunctions in pairs(self.apps) do
       local appIsWatched = util.bundleIdHasPrefix(appObjectBundleId, appBundleId)
       if (appIsWatched) then
